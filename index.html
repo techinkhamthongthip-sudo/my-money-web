@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ระบบบริหารเงินประจำห้อง ม.5/15</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+
+<!-- =====================================================
+     หน้าแรก
+===================================================== -->
+
+<section id="welcomeScreen" class="welcome-screen">
+
+    <div class="welcome-overlay"></div>
+
+    <div class="welcome-content">
+
+        <img
+            src="SSW.png"
+            id="schoolLogo"
+            class="school-logo"
+            alt="ตราโรงเรียน"
+        >
+
+        <div class="school-name">
+            โรงเรียนศรีสงครามวิทยา
+        </div>
+
+        <h1>
+            ระบบบริหารเงินประจำห้อง
+        </h1>
+
+        <div class="room-badge">
+            ม.5/15
+        </div>
+
+        <p class="welcome-description">
+            ระบบจัดการเงินประจำห้อง
+        </p>
+
+        <p class="welcome-functions">
+            ตรวจสอบยอด • แจ้งชำระ • ดูยอดสมาชิก
+        </p>
+
+
+        <!-- ช่องรหัส -->
+        <div class="login-box">
+
+            <input
+                type="password"
+                id="accessCode"
+                class="access-code"
+                maxlength="5"
+                inputmode="numeric"
+                placeholder="กรอกรหัส 5 หลัก"
+                autocomplete="off"
+            >
+
+            <button
+                id="confirmCode"
+                class="confirm-button"
+                type="button"
+            >
+                ยืนยัน
+                <span>→</span>
+            </button>
+
+            <div
+                id="codeMessage"
+                class="code-message"
+            ></div>
+
+        </div>
+
+
+        <div class="welcome-footer">
+            M.5/15 • SSW
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     หน้าหลัก
+===================================================== -->
+
+<main id="homePage" class="page home-page">
+
+    <div class="main-container">
+
+        <div class="main-header">
+
+            <div>
+                <div class="small-title">
+                    โรงเรียนศรีสงครามวิทยา
+                </div>
+
+                <h2>
+                    ระบบบริหารเงินประจำห้อง ม.5/15
+                </h2>
+            </div>
+
+            <img
+                src="SSW.png"
+                class="header-logo"
+                alt="ตราโรงเรียน"
+            >
+
+        </div>
+
+
+        <div class="home-grid">
+
+            <!-- ตรวจสอบยอด -->
+            <button
+                id="openCheck"
+                class="menu-card"
+                type="button"
+            >
+                <div class="menu-icon">฿</div>
+
+                <div class="menu-title">
+                    ตรวจสอบยอดของฉัน
+                </div>
+
+                <div class="menu-description">
+                    ตรวจสอบยอดที่ต้องจ่าย
+                    และยอดที่ชำระแล้ว
+                </div>
+            </button>
+
+
+            <!-- แจ้งชำระ -->
+            <button
+                id="openPayment"
+                class="menu-card"
+                type="button"
+            >
+                <div class="menu-icon">↑</div>
+
+                <div class="menu-title">
+                    แจ้งชำระเงิน
+                </div>
+
+                <div class="menu-description">
+                    สแกน QR และแนบสลิป
+                    เพื่อแจ้งชำระเงิน
+                </div>
+            </button>
+
+
+            <!-- ดูยอดทุกคน -->
+            <button
+                id="openOverview"
+                class="menu-card"
+                type="button"
+            >
+                <div class="menu-icon">👥</div>
+
+                <div class="menu-title">
+                    ดูยอดเงินทุกคน
+                </div>
+
+                <div class="menu-description">
+                    ดูยอดการชำระเงิน
+                    ของสมาชิกทุกคน
+                </div>
+            </button>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     ตรวจสอบยอด
+===================================================== -->
+
+<section id="checkPage" class="page">
+
+    <div class="form-container">
+
+        <button
+            id="backFromCheck"
+            class="back-button"
+            type="button"
+        >
+            ← กลับ
+        </button>
+
+        <div class="section-title">
+            ตรวจสอบยอดของฉัน
+        </div>
+
+        <div class="form-card">
+
+            <label>
+                เลขที่
+            </label>
+
+            <select id="student">
+                <option value="">
+                    -- เลือกเลขที่ --
+                </option>
+            </select>
+
+
+            <label>
+                ชื่อ-นามสกุล
+            </label>
+
+            <select id="studentName">
+                <option value="">
+                    -- เลือกชื่อ --
+                </option>
+            </select>
+
+
+            <label>
+                เดือน
+            </label>
+
+            <select id="month">
+
+                <option value="">
+                    -- เลือกเดือน --
+                </option>
+
+                <option value="มกราคม">มกราคม</option>
+                <option value="กุมภาพันธ์">กุมภาพันธ์</option>
+                <option value="มีนาคม">มีนาคม</option>
+                <option value="เมษายน">เมษายน</option>
+                <option value="พฤษภาคม">พฤษภาคม</option>
+                <option value="มิถุนายน">มิถุนายน</option>
+                <option value="กรกฎาคม">กรกฎาคม</option>
+                <option value="สิงหาคม">สิงหาคม</option>
+                <option value="กันยายน">กันยายน</option>
+                <option value="ตุลาคม">ตุลาคม</option>
+                <option value="พฤศจิกายน">พฤศจิกายน</option>
+                <option value="ธันวาคม">ธันวาคม</option>
+
+            </select>
+
+
+            <div class="payment-summary">
+
+                <div class="summary-item">
+                    <span>ยอดที่ต้องจ่าย</span>
+                    <strong id="required">0 บาท</strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>ยอดที่จ่ายแล้ว</span>
+                    <strong id="paid">0 บาท</strong>
+                </div>
+
+                <div class="summary-item remaining">
+                    <span>ยอดคงเหลือ</span>
+                    <strong id="remaining">0 บาท</strong>
+                </div>
+
+            </div>
+
+
+            <div
+                id="status"
+                class="status-message"
+            >
+                กรุณาเลือกเลขที่และเดือน
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     แจ้งชำระ
+===================================================== -->
+
+<section id="paymentPage" class="page">
+
+    <div class="form-container">
+
+        <button
+            id="backFromPayment"
+            class="back-button"
+            type="button"
+        >
+            ← กลับ
+        </button>
+
+        <div class="section-title">
+            แจ้งชำระเงิน
+        </div>
+
+        <div class="form-card">
+
+            <label>
+                เลขที่
+            </label>
+
+            <select id="paymentStudent">
+                <option value="">
+                    -- เลือกเลขที่ --
+                </option>
+            </select>
+
+
+            <label>
+                ชื่อ-นามสกุล
+            </label>
+
+            <select id="paymentStudentName">
+                <option value="">
+                    -- เลือกชื่อ --
+                </option>
+            </select>
+
+
+            <label>
+                เดือน
+            </label>
+
+            <select id="paymentMonth">
+
+                <option value="">
+                    -- เลือกเดือน --
+                </option>
+
+                <option value="มกราคม">มกราคม</option>
+                <option value="กุมภาพันธ์">กุมภาพันธ์</option>
+                <option value="มีนาคม">มีนาคม</option>
+                <option value="เมษายน">เมษายน</option>
+                <option value="พฤษภาคม">พฤษภาคม</option>
+                <option value="มิถุนายน">มิถุนายน</option>
+                <option value="กรกฎาคม">กรกฎาคม</option>
+                <option value="สิงหาคม">สิงหาคม</option>
+                <option value="กันยายน">กันยายน</option>
+                <option value="ตุลาคม">ตุลาคม</option>
+                <option value="พฤศจิกายน">พฤศจิกายน</option>
+                <option value="ธันวาคม">ธันวาคม</option>
+
+            </select>
+
+
+            <label>
+                จำนวนเงินที่โอน
+            </label>
+
+            <input
+                type="number"
+                id="amount"
+                min="1"
+                step="0.01"
+                placeholder="เช่น 30"
+            >
+
+
+            <div class="qr-section">
+
+                <div class="qr-title">
+                    สแกนเพื่อชำระเงิน
+                </div>
+
+                <div id="qrcode"></div>
+
+                <div class="qr-price">
+                    ยอดชำระ
+                    <strong id="qrAmount">—</strong>
+                </div>
+
+            </div>
+
+
+            <label>
+                วันที่โอน
+            </label>
+
+            <input
+                type="date"
+                id="date"
+            >
+
+
+            <label>
+                สลิปการโอน
+            </label>
+
+            <input
+                type="file"
+                id="slipFile"
+                accept="image/*"
+            >
+
+            <div
+                id="fileName"
+                class="file-name"
+            >
+                ยังไม่ได้เลือกไฟล์
+            </div>
+
+
+            <button
+                id="submitPayment"
+                class="submit-button"
+                type="button"
+            >
+                ยืนยันการแจ้งชำระ
+            </button>
+
+
+            <div
+                id="submitStatus"
+                class="status-message"
+            ></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     ดูยอดทุกคน
+===================================================== -->
+
+<section id="overviewPage" class="page">
+
+    <div class="overview-container">
+
+        <button
+            id="backFromOverview"
+            class="back-button"
+            type="button"
+        >
+            ← กลับ
+        </button>
+
+
+        <div class="section-title">
+            ดูยอดเงินทุกคน
+        </div>
+
+
+        <div class="overview-control">
+
+            <label>
+                เลือกเดือน
+            </label>
+
+            <select id="overviewMonth">
+
+                <option value="มกราคม">มกราคม</option>
+                <option value="กุมภาพันธ์">กุมภาพันธ์</option>
+                <option value="มีนาคม">มีนาคม</option>
+                <option value="เมษายน">เมษายน</option>
+                <option value="พฤษภาคม">พฤษภาคม</option>
+                <option value="มิถุนายน">มิถุนายน</option>
+                <option value="กรกฎาคม">กรกฎาคม</option>
+                <option value="สิงหาคม">สิงหาคม</option>
+                <option value="กันยายน">กันยายน</option>
+                <option value="ตุลาคม">ตุลาคม</option>
+                <option value="พฤศจิกายน">พฤศจิกายน</option>
+                <option value="ธันวาคม">ธันวาคม</option>
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="overviewStatus"
+            class="overview-status"
+        >
+            กำลังโหลดข้อมูล...
+        </div>
+
+
+        <div
+            id="studentGrid"
+            class="student-grid"
+        ></div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     หน้ารายละเอียดนักเรียน
+===================================================== -->
+
+<div
+    id="studentModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <button
+            id="closeModal"
+            class="modal-close"
+            type="button"
+        >
+            ×
+        </button>
+
+        <div class="modal-avatar">
+            👤
+        </div>
+
+        <div
+            id="detailNumber"
+            class="detail-number"
+        >
+            เลขที่ -
+        </div>
+
+        <h3 id="detailName">
+            -
+        </h3>
+
+
+        <div class="detail-list">
+
+            <div>
+                <span>ยอดที่ต้องจ่าย</span>
+                <strong id="detailRequired">
+                    0 บาท
+                </strong>
+            </div>
+
+            <div>
+                <span>ยอดที่จ่ายแล้ว</span>
+                <strong id="detailPaid">
+                    0 บาท
+                </strong>
+            </div>
+
+            <div>
+                <span>ยอดคงเหลือ</span>
+                <strong id="detailRemaining">
+                    0 บาท
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div
+            id="detailStatus"
+            class="detail-status"
+        >
+            -
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
