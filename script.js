@@ -1,108 +1,35 @@
 // =====================================================
 // ระบบบริหารเงินประจำห้อง ม.5/15
-// SCRIPT.JS
+// SCRIPT.JS — V3 AUTHENTICATION FIX
 // =====================================================
-
 
 const API_URL =
     "https://script.google.com/macros/s/AKfycbyasX67a_85EcRXBicAkV7Si0MPOo6CLdch3VKDJJxBHr2G9C9nEMx-U7MI7CczuGvTJA/exec";
 
-
-const PROMPTPAY_NUMBER =
-    "0801056605";
+const PROMPTPAY_NUMBER = "0801056605";
 
 
-/* =====================================================
-   รหัสผ่าน 5 หลัก
-===================================================== */
+// =====================================================
+// AUTHENTICATION
+// =====================================================
 
-const ACCESS_CODES = [
-
-    "33362",
-    "33365",
-    "33457",
-    "36280",
-    "36281",
-    "36282",
-    "36284",
-    "36285",
-    "36286",
-    "36287",
-    "36288",
-    "36289",
-    "32914",
-    "33029",
-    "33175",
-    "33284",
-    "33355",
-    "33487",
-    "33488",
-    "33489",
-    "33492",
-    "36290",
-    "36291",
-    "36292",
-    "36293",
-    "36294",
-    "36295",
-    "36296",
-    "36298",
-    "36299",
-    "36300",
-    "36301",
-    "36303",
-    "36304",
-    "36305"
-
-];
-
+let AUTH_TOKEN =
+    sessionStorage.getItem("M515_AUTH_TOKEN") || "";
 
 let students = [];
 
 
-/* =====================================================
-   DOM
-===================================================== */
+// =====================================================
+// DOM
+// =====================================================
 
-const welcomeScreen =
-    document.getElementById(
-        "welcomeScreen"
-    );
+const $ = (id) =>
+    document.getElementById(id);
 
 
-const schoolLogo =
-    document.getElementById(
-        "schoolLogo"
-    );
-
-
-const homePage =
-    document.getElementById(
-        "homePage"
-    );
-
-
-const checkPage =
-    document.getElementById(
-        "checkPage"
-    );
-
-
-const paymentPage =
-    document.getElementById(
-        "paymentPage"
-    );
-
-
-const overviewPage =
-    document.getElementById(
-        "overviewPage"
-    );
-
-
-/* =====================================================
-   เริ่มต้น
-===================================================== */
+// =====================================================
+// เริ่มระบบ
+// =====================================================
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -110,86 +37,234 @@ document.addEventListener(
 
         hideAllPages();
 
-        if (welcomeScreen) {
-            welcomeScreen.style.display =
-                "flex";
+        const welcome = $("welcomeScreen");
+
+        if (welcome) {
+            welcome.style.display = "flex";
         }
 
-
-        loadStudents();
-
-        setupButtons();
-
         setupLogin();
-
-        setupSlipFile();
-
+        setupButtons();
         setupQR();
-
+        setupSlipFile();
         setupOverview();
 
     }
 );
 
 
-/* =====================================================
-   ซ่อนทุกหน้า
-===================================================== */
+// =====================================================
+// ซ่อนทุกหน้า
+// =====================================================
 
 function hideAllPages() {
 
-    if (welcomeScreen)
-        welcomeScreen.style.display =
-            "none";
+    const pages = [
+        "welcomeScreen",
+        "homePage",
+        "checkPage",
+        "paymentPage",
+        "overviewPage"
+    ];
 
-    if (homePage)
-        homePage.style.display =
-            "none";
+    pages.forEach(
+        function (id) {
 
-    if (checkPage)
-        checkPage.style.display =
-            "none";
+            const el = $(id);
 
-    if (paymentPage)
-        paymentPage.style.display =
-            "none";
+            if (el) {
+                el.style.display = "none";
+            }
 
-    if (overviewPage)
-        overviewPage.style.display =
-            "none";
+        }
+    );
 
 }
 
 
-/* =====================================================
-   ระบบรหัสผ่าน
-===================================================== */
+// =====================================================
+// TOKEN
+// =====================================================
+
+function getAuthToken() {
+
+    return (
+        String(AUTH_TOKEN || "").trim() ||
+        String(
+            sessionStorage.getItem(
+                "M515_AUTH_TOKEN"
+            ) || ""
+        ).trim()
+    );
+
+}
+
+
+// =====================================================
+// ตรวจสอบ Error ของ Authentication
+// =====================================================
+
+function isAuthError(message) {
+
+    const msg =
+        String(message || "");
+
+
+    return (
+        msg.includes("ไม่ได้เข้าสู่ระบบ") ||
+        msg.includes("Token ไม่ถูกต้อง") ||
+        msg.includes("Session หมดอายุ") ||
+        msg.includes("Login ไม่ได้ส่ง Token") ||
+        msg.includes("หมดอายุ")
+    );
+
+}
+
+
+// =====================================================
+// จัดการ Session หมดอายุ
+// =====================================================
+
+function handleAuthError(message) {
+
+    if (!isAuthError(message)) {
+        return false;
+    }
+
+
+    AUTH_TOKEN = "";
+
+    sessionStorage.removeItem(
+        "M515_AUTH_TOKEN"
+    );
+
+
+    alert(
+        "เซสชันเข้าสู่ระบบหมดอายุ กรุณาเข้าสู่ระบบใหม่"
+    );
+
+
+    location.reload();
+
+
+    return true;
+
+}
+
+
+// =====================================================
+// LOGOUT
+// =====================================================
+
+function logout() {
+
+    AUTH_TOKEN = "";
+
+    sessionStorage.removeItem(
+        "M515_AUTH_TOKEN"
+    );
+
+    location.reload();
+
+}
+
+
+// =====================================================
+// สร้าง API URL
+// ป้องกัน Browser ใช้ข้อมูลเก่า
+// =====================================================
+
+function buildApiUrl(
+    action,
+    params = {}
+) {
+
+    const url =
+        new URL(
+            API_URL
+        );
+
+
+    url.searchParams.set(
+        "action",
+        action
+    );
+
+
+    const token =
+        getAuthToken();
+
+
+    if (token) {
+
+        url.searchParams.set(
+            "token",
+            token
+        );
+
+    }
+
+
+    Object.keys(params).forEach(
+        function (key) {
+
+            const value =
+                params[key];
+
+
+            if (
+                value !== undefined &&
+                value !== null
+            ) {
+
+                url.searchParams.set(
+                    key,
+                    value
+                );
+
+            }
+
+        }
+    );
+
+
+    // ป้องกัน Cache
+    url.searchParams.set(
+        "_t",
+        Date.now()
+    );
+
+
+    return url.toString();
+
+}
+
+
+// =====================================================
+// LOGIN
+// =====================================================
 
 function setupLogin() {
 
-    const codeInput =
-        document.getElementById(
-            "accessCode"
-        );
+    const input =
+        $("accessCode");
+
+    const button =
+        $("confirmCode");
 
 
-    const confirmButton =
-        document.getElementById(
-            "confirmCode"
-        );
-
-
-    if (!codeInput || !confirmButton)
+    if (!input || !button) {
         return;
+    }
 
 
-    confirmButton.addEventListener(
+    button.addEventListener(
         "click",
         checkAccessCode
     );
 
 
-    codeInput.addEventListener(
+    input.addEventListener(
         "keydown",
         function (event) {
 
@@ -205,227 +280,323 @@ function setupLogin() {
 }
 
 
-function checkAccessCode() {
+// =====================================================
+// ตรวจสอบรหัส
+// =====================================================
 
-    const codeInput =
-        document.getElementById(
-            "accessCode"
-        );
+async function checkAccessCode() {
 
+    const input =
+        $("accessCode");
 
     const message =
-        document.getElementById(
-            "codeMessage"
-        );
+        $("codeMessage");
+
+
+    if (!input) {
+        return;
+    }
 
 
     const code =
-        codeInput.value.trim();
+        input.value.trim();
 
 
-    if (
-        !/^\d{5}$/.test(code)
-    ) {
+    if (!/^\d{5}$/.test(code)) {
 
-        message.textContent =
-            "กรุณากรอกรหัสตัวเลข 5 หลัก";
+        if (message) {
 
-        codeInput.focus();
+            message.textContent =
+                "กรุณากรอกรหัสตัวเลข 5 หลัก";
+
+        }
+
+        input.focus();
 
         return;
-
     }
 
 
-    if (
-        !ACCESS_CODES.includes(code)
-    ) {
+    try {
 
-        message.textContent =
-            "รหัสไม่ถูกต้อง";
+        if (message) {
 
-        codeInput.value = "";
+            message.textContent =
+                "กำลังตรวจสอบ...";
 
-        codeInput.focus();
-
-        return;
-
-    }
+        }
 
 
-    /* รหัสถูกต้อง */
+        // Login ไม่ต้องใช้ Token
+        const url =
+            buildApiUrl(
+                "login",
+                {
+                    code: code
+                }
+            );
 
-    message.textContent =
-        "ยืนยันสำเร็จ ✓";
+
+        const response =
+            await fetch(
+                url,
+                {
+                    cache: "no-store"
+                }
+            );
 
 
-    codeInput.disabled = true;
+        if (!response.ok) {
+
+            throw new Error(
+                "เซิร์ฟเวอร์ตอบกลับ HTTP " +
+                response.status
+            );
+
+        }
 
 
-    const button =
-        document.getElementById(
-            "confirmCode"
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            if (message) {
+
+                message.textContent =
+                    data.message ||
+                    "รหัสไม่ถูกต้อง";
+
+            }
+
+            input.value = "";
+
+            input.focus();
+
+            return;
+        }
+
+
+        // =================================================
+        // สำคัญมาก
+        // ตรวจสอบว่า Backend ส่ง Token กลับมาจริง
+        // =================================================
+
+        if (!data.token) {
+
+            throw new Error(
+                "ระบบ Login ไม่ได้ส่ง Token กลับมา"
+            );
+
+        }
+
+
+        AUTH_TOKEN =
+            String(
+                data.token
+            ).trim();
+
+
+        if (!AUTH_TOKEN) {
+
+            throw new Error(
+                "ระบบ Login ส่ง Token ว่างกลับมา"
+            );
+
+        }
+
+
+        sessionStorage.setItem(
+            "M515_AUTH_TOKEN",
+            AUTH_TOKEN
         );
 
 
-    button.disabled = true;
+        // =================================================
+        // โหลดข้อมูลหลัง Login
+        // =================================================
+
+        await loadStudents();
 
 
-    /* ตราโรงเรียนหมุนเอง */
+        if (message) {
 
-    if (schoolLogo) {
+            message.textContent =
+                "เข้าสู่ระบบสำเร็จ ✓";
 
-        schoolLogo.animate(
+        }
 
-            [
 
+        input.disabled = true;
+
+
+        const button =
+            $("confirmCode");
+
+        if (button) {
+            button.disabled = true;
+        }
+
+
+        // =================================================
+        // หมุนโลโก้
+        // =================================================
+
+        const logo =
+            $("schoolLogo");
+
+
+        if (logo) {
+
+            logo.animate(
+                [
+                    {
+                        transform:
+                            "rotate(0deg) scale(1)"
+                    },
+                    {
+                        transform:
+                            "rotate(360deg) scale(1.08)"
+                    },
+                    {
+                        transform:
+                            "rotate(720deg) scale(1)"
+                    },
+                    {
+                        transform:
+                            "rotate(1080deg) scale(1.05)"
+                    },
+                    {
+                        transform:
+                            "rotate(1440deg) scale(1)"
+                    }
+                ],
                 {
-                    transform:
-                        "rotate(0deg) scale(1)"
-                },
+                    duration: 1800,
+                    easing:
+                        "cubic-bezier(.2,.8,.2,1)",
+                    fill: "forwards"
+                }
+            );
 
-                {
-                    transform:
-                        "rotate(360deg) scale(1.08)"
-                },
+        }
 
-                {
-                    transform:
-                        "rotate(720deg) scale(1)"
-                },
 
-                {
-                    transform:
-                        "rotate(1080deg) scale(1.05)"
-                },
+        // =================================================
+        // เปลี่ยนหน้า
+        // =================================================
 
-                {
-                    transform:
-                        "rotate(1440deg) scale(1)"
+        setTimeout(
+            function () {
+
+                const welcome =
+                    $("welcomeScreen");
+
+                if (welcome) {
+
+                    welcome.animate(
+                        [
+                            {
+                                opacity: 1,
+                                transform:
+                                    "scale(1)"
+                            },
+                            {
+                                opacity: 0,
+                                transform:
+                                    "scale(1.04)"
+                            }
+                        ],
+                        {
+                            duration: 600,
+                            easing: "ease-in",
+                            fill: "forwards"
+                        }
+                    );
+
                 }
 
-            ],
+            },
+            1200
+        );
 
-            {
 
-                duration: 1800,
+        setTimeout(
+            function () {
 
-                easing:
-                    "cubic-bezier(.2,.8,.2,1)",
+                hideAllPages();
 
-                fill: "forwards"
 
-            }
+                const home =
+                    $("homePage");
 
+
+                if (home) {
+
+                    home.style.display =
+                        "block";
+
+
+                    home.animate(
+                        [
+                            {
+                                opacity: 0,
+                                transform:
+                                    "translateY(20px)"
+                            },
+                            {
+                                opacity: 1,
+                                transform:
+                                    "translateY(0)"
+                            }
+                        ],
+                        {
+                            duration: 500,
+                            easing: "ease-out"
+                        }
+                    );
+
+                }
+
+            },
+            1800
         );
 
     }
+    catch (error) {
+
+        console.error(
+            "LOGIN ERROR:",
+            error
+        );
 
 
-    /* ค่อย ๆ จางหน้าแรก */
+        if (message) {
 
-    setTimeout(
-        function () {
+            message.textContent =
+                error.message ||
+                "ไม่สามารถเชื่อมต่อระบบได้";
 
-            if (welcomeScreen) {
+        }
 
-                welcomeScreen.animate(
-
-                    [
-
-                        {
-                            opacity: 1,
-                            transform:
-                                "scale(1)"
-                        },
-
-                        {
-                            opacity: 0,
-                            transform:
-                                "scale(1.04)"
-                        }
-
-                    ],
-
-                    {
-
-                        duration: 600,
-
-                        easing: "ease-in",
-
-                        fill: "forwards"
-
-                    }
-
-                );
-
-            }
-
-        },
-        1200
-    );
-
-
-    /* เข้าเว็บอัตโนมัติ */
-
-    setTimeout(
-        function () {
-
-            hideAllPages();
-
-            if (homePage) {
-
-                homePage.style.display =
-                    "block";
-
-                homePage.animate(
-
-                    [
-
-                        {
-                            opacity: 0,
-                            transform:
-                                "translateY(20px)"
-                        },
-
-                        {
-                            opacity: 1,
-                            transform:
-                                "translateY(0)"
-                        }
-
-                    ],
-
-                    {
-
-                        duration: 500,
-
-                        easing: "ease-out"
-
-                    }
-
-                );
-
-            }
-
-        },
-        1800
-    );
+    }
 
 }
 
 
-/* =====================================================
-   ปุ่มต่าง ๆ
-===================================================== */
+// =====================================================
+// ปุ่มเมนู
+// =====================================================
 
 function setupButtons() {
 
-    const openCheck =
-        document.getElementById(
-            "openCheck"
-        );
+    // =================================================
+    // ตรวจสอบยอด
+    // =================================================
 
+    const openCheck =
+        $("openCheck");
 
     if (openCheck) {
 
@@ -437,11 +608,12 @@ function setupButtons() {
     }
 
 
-    const openPayment =
-        document.getElementById(
-            "openPayment"
-        );
+    // =================================================
+    // แจ้งชำระ
+    // =================================================
 
+    const openPayment =
+        $("openPayment");
 
     if (openPayment) {
 
@@ -453,11 +625,12 @@ function setupButtons() {
     }
 
 
-    const openOverview =
-        document.getElementById(
-            "openOverview"
-        );
+    // =================================================
+    // ดูยอดทุกคน
+    // =================================================
 
+    const openOverview =
+        $("openOverview");
 
     if (openOverview) {
 
@@ -469,15 +642,16 @@ function setupButtons() {
     }
 
 
-    const backFromCheck =
-        document.getElementById(
-            "backFromCheck"
-        );
+    // =================================================
+    // กลับหน้าแรก
+    // =================================================
 
+    const backCheck =
+        $("backFromCheck");
 
-    if (backFromCheck) {
+    if (backCheck) {
 
-        backFromCheck.addEventListener(
+        backCheck.addEventListener(
             "click",
             showHome
         );
@@ -485,15 +659,12 @@ function setupButtons() {
     }
 
 
-    const backFromPayment =
-        document.getElementById(
-            "backFromPayment"
-        );
+    const backPayment =
+        $("backFromPayment");
 
+    if (backPayment) {
 
-    if (backFromPayment) {
-
-        backFromPayment.addEventListener(
+        backPayment.addEventListener(
             "click",
             showHome
         );
@@ -501,27 +672,25 @@ function setupButtons() {
     }
 
 
-    const backFromOverview =
-        document.getElementById(
-            "backFromOverview"
-        );
+    const backOverview =
+        $("backFromOverview");
 
+    if (backOverview) {
 
-    if (backFromOverview) {
-
-        backFromOverview.addEventListener(
+        backOverview.addEventListener(
             "click",
             showHome
         );
 
     }
 
+
+    // =================================================
+    // เลือกนักเรียน
+    // =================================================
 
     const student =
-        document.getElementById(
-            "student"
-        );
-
+        $("student");
 
     if (student) {
 
@@ -539,27 +708,12 @@ function setupButtons() {
     }
 
 
-    const studentName =
-        document.getElementById(
-            "studentName"
-        );
-
-
-    if (studentName) {
-
-        studentName.addEventListener(
-            "change",
-            checkPayment
-        );
-
-    }
-
+    // =================================================
+    // เดือน
+    // =================================================
 
     const month =
-        document.getElementById(
-            "month"
-        );
-
+        $("month");
 
     if (month) {
 
@@ -571,11 +725,12 @@ function setupButtons() {
     }
 
 
-    const paymentStudent =
-        document.getElementById(
-            "paymentStudent"
-        );
+    // =================================================
+    // นักเรียนหน้าแจ้งชำระ
+    // =================================================
 
+    const paymentStudent =
+        $("paymentStudent");
 
     if (paymentStudent) {
 
@@ -587,15 +742,16 @@ function setupButtons() {
     }
 
 
-    const submitPayment =
-        document.getElementById(
-            "submitPayment"
-        );
+    // =================================================
+    // ส่งข้อมูล
+    // =================================================
 
+    const submit =
+        $("submitPayment");
 
-    if (submitPayment) {
+    if (submit) {
 
-        submitPayment.addEventListener(
+        submit.addEventListener(
             "click",
             submitPaymentData
         );
@@ -603,11 +759,12 @@ function setupButtons() {
     }
 
 
-    const closeModal =
-        document.getElementById(
-            "closeModal"
-        );
+    // =================================================
+    // ปิด Modal
+    // =================================================
 
+    const closeModal =
+        $("closeModal");
 
     if (closeModal) {
 
@@ -620,10 +777,7 @@ function setupButtons() {
 
 
     const modal =
-        document.getElementById(
-            "studentModal"
-        );
-
+        $("studentModal");
 
     if (modal) {
 
@@ -647,17 +801,20 @@ function setupButtons() {
 }
 
 
-/* =====================================================
-   หน้า
-===================================================== */
+// =====================================================
+// เปลี่ยนหน้า
+// =====================================================
 
 function showHome() {
 
     hideAllPages();
 
-    if (homePage) {
+    const home =
+        $("homePage");
 
-        homePage.style.display =
+    if (home) {
+
+        home.style.display =
             "block";
 
     }
@@ -669,9 +826,12 @@ function showCheckPage() {
 
     hideAllPages();
 
-    if (checkPage) {
+    const page =
+        $("checkPage");
 
-        checkPage.style.display =
+    if (page) {
+
+        page.style.display =
             "block";
 
     }
@@ -683,9 +843,12 @@ function showPaymentPage() {
 
     hideAllPages();
 
-    if (paymentPage) {
+    const page =
+        $("paymentPage");
 
-        paymentPage.style.display =
+    if (page) {
+
+        page.style.display =
             "block";
 
     }
@@ -697,11 +860,29 @@ function showPaymentPage() {
 
 function showOverviewPage() {
 
+    // =================================================
+    // ตรวจ Token ก่อนเปิดหน้า
+    // =================================================
+
+    if (!getAuthToken()) {
+
+        alert(
+            "กรุณาเข้าสู่ระบบก่อน"
+        );
+
+        return;
+
+    }
+
+
     hideAllPages();
 
-    if (overviewPage) {
+    const page =
+        $("overviewPage");
 
-        overviewPage.style.display =
+    if (page) {
+
+        page.style.display =
             "block";
 
     }
@@ -711,27 +892,63 @@ function showOverviewPage() {
 }
 
 
-/* =====================================================
-   โหลดนักเรียน
-===================================================== */
+// =====================================================
+// โหลดรายชื่อนักเรียน
+// =====================================================
 
 async function loadStudents() {
 
     try {
 
+        const url =
+            buildApiUrl(
+                "students"
+            );
+
+
         const response =
             await fetch(
-                API_URL +
-                "?action=students"
+                url,
+                {
+                    cache: "no-store"
+                }
             );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "เซิร์ฟเวอร์ตอบกลับ HTTP " +
+                response.status
+            );
+
+        }
 
 
         const data =
             await response.json();
 
 
+        if (!data.success) {
+
+            if (
+                handleAuthError(
+                    data.message
+                )
+            ) {
+                return;
+            }
+
+
+            throw new Error(
+                data.message ||
+                "โหลดรายชื่อไม่สำเร็จ"
+            );
+
+        }
+
+
         if (
-            data.success &&
             Array.isArray(
                 data.students
             )
@@ -740,40 +957,50 @@ async function loadStudents() {
             students =
                 data.students;
 
-
-            populateStudentSelects();
-
         }
+
+
+        populateStudentSelects();
 
     }
     catch (error) {
 
         console.error(
-            "โหลดรายชื่อไม่สำเร็จ",
+            "LOAD STUDENTS ERROR:",
             error
         );
+
+
+        if (
+            !isAuthError(
+                error.message
+            )
+        ) {
+
+            alert(
+                error.message ||
+                "ไม่สามารถโหลดรายชื่อนักเรียนได้"
+            );
+
+        }
 
     }
 
 }
 
 
-/* =====================================================
-   Select นักเรียน
-===================================================== */
+// =====================================================
+// สร้าง Select นักเรียน
+// =====================================================
 
 function populateStudentSelects() {
 
     const checkStudent =
-        document.getElementById(
-            "student"
-        );
+        $("student");
 
 
     const paymentStudent =
-        document.getElementById(
-            "paymentStudent"
-        );
+        $("paymentStudent");
 
 
     if (checkStudent) {
@@ -802,11 +1029,14 @@ function populateStudentSelects() {
                         "option"
                     );
 
+
                 option.value =
                     student.number;
 
+
                 option.textContent =
                     student.number;
+
 
                 checkStudent.appendChild(
                     option
@@ -822,11 +1052,14 @@ function populateStudentSelects() {
                         "option"
                     );
 
+
                 option.value =
                     student.number;
 
+
                 option.textContent =
                     student.number;
+
 
                 paymentStudent.appendChild(
                     option
@@ -840,26 +1073,23 @@ function populateStudentSelects() {
 }
 
 
-/* =====================================================
-   ชื่ออัตโนมัติ
-===================================================== */
+// =====================================================
+// แสดงชื่อจากเลขที่
+// =====================================================
 
 function updateCheckStudentName() {
 
     const number =
-        document.getElementById(
-            "student"
-        )?.value;
+        $("student")?.value;
 
 
     const nameSelect =
-        document.getElementById(
-            "studentName"
-        );
+        $("studentName");
 
 
-    if (!nameSelect)
+    if (!nameSelect) {
         return;
+    }
 
 
     nameSelect.innerHTML =
@@ -872,7 +1102,8 @@ function updateCheckStudentName() {
 
                 return String(
                     item.number
-                ) === String(number);
+                ) ===
+                String(number);
 
             }
         );
@@ -885,14 +1116,18 @@ function updateCheckStudentName() {
                 "option"
             );
 
+
         option.value =
             student.name;
+
 
         option.textContent =
             student.name;
 
+
         option.selected =
             true;
+
 
         nameSelect.appendChild(
             option
@@ -906,19 +1141,16 @@ function updateCheckStudentName() {
 function updatePaymentStudentName() {
 
     const number =
-        document.getElementById(
-            "paymentStudent"
-        )?.value;
+        $("paymentStudent")?.value;
 
 
     const nameSelect =
-        document.getElementById(
-            "paymentStudentName"
-        );
+        $("paymentStudentName");
 
 
-    if (!nameSelect)
+    if (!nameSelect) {
         return;
+    }
 
 
     nameSelect.innerHTML =
@@ -931,7 +1163,8 @@ function updatePaymentStudentName() {
 
                 return String(
                     item.number
-                ) === String(number);
+                ) ===
+                String(number);
 
             }
         );
@@ -944,14 +1177,18 @@ function updatePaymentStudentName() {
                 "option"
             );
 
+
         option.value =
             student.name;
+
 
         option.textContent =
             student.name;
 
+
         option.selected =
             true;
+
 
         nameSelect.appendChild(
             option
@@ -962,54 +1199,71 @@ function updatePaymentStudentName() {
 }
 
 
-/* =====================================================
-   ตรวจสอบยอด
-===================================================== */
+// =====================================================
+// ตรวจสอบยอด
+// =====================================================
 
 async function checkPayment() {
 
     const number =
-        document.getElementById(
-            "student"
-        )?.value;
+        $("student")?.value;
 
 
     const month =
-        document.getElementById(
-            "month"
-        )?.value;
+        $("month")?.value;
 
 
     const status =
-        document.getElementById(
-            "status"
-        );
+        $("status");
 
 
-    if (!number || !month) {
-
-        document.getElementById(
-            "required"
-        ).textContent =
-            "0 บาท";
+    const requiredEl =
+        $("required");
 
 
-        document.getElementById(
-            "paid"
-        ).textContent =
-            "0 บาท";
+    const paidEl =
+        $("paid");
 
 
-        document.getElementById(
-            "remaining"
-        ).textContent =
-            "0 บาท";
+    const remainingEl =
+        $("remaining");
 
+
+    if (
+        !number ||
+        !month
+    ) {
+
+        if (requiredEl) {
+            requiredEl.textContent =
+                "0 บาท";
+        }
+
+        if (paidEl) {
+            paidEl.textContent =
+                "0 บาท";
+        }
+
+        if (remainingEl) {
+            remainingEl.textContent =
+                "0 บาท";
+        }
+
+        if (status) {
+            status.textContent =
+                "กรุณาเลือกเลขที่ ชื่อ และเดือน";
+        }
+
+        return;
+    }
+
+
+    if (!getAuthToken()) {
 
         if (status) {
 
             status.textContent =
-                "กรุณาเลือกเลขที่ ชื่อ และเดือน";
+                "กรุณาเข้าสู่ระบบใหม่";
 
         }
 
@@ -1021,16 +1275,35 @@ async function checkPayment() {
     try {
 
         const url =
-            API_URL +
-            "?action=payment" +
-            "&number=" +
-            encodeURIComponent(number) +
-            "&month=" +
-            encodeURIComponent(month);
+            buildApiUrl(
+                "payment",
+                {
+                    number:
+                        number,
+
+                    month:
+                        month
+                }
+            );
 
 
         const response =
-            await fetch(url);
+            await fetch(
+                url,
+                {
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "เซิร์ฟเวอร์ตอบกลับ HTTP " +
+                response.status
+            );
+
+        }
 
 
         const data =
@@ -1038,6 +1311,15 @@ async function checkPayment() {
 
 
         if (!data.success) {
+
+            if (
+                handleAuthError(
+                    data.message
+                )
+            ) {
+                return;
+            }
+
 
             if (status) {
 
@@ -1048,16 +1330,19 @@ async function checkPayment() {
             }
 
             return;
-
         }
 
 
         const required =
-            Number(data.required) || 0;
+            Number(
+                data.required
+            ) || 0;
 
 
         const paid =
-            Number(data.paid) || 0;
+            Number(
+                data.paid
+            ) || 0;
 
 
         const remaining =
@@ -1067,36 +1352,45 @@ async function checkPayment() {
             );
 
 
-        document.getElementById(
-            "required"
-        ).textContent =
-            required.toLocaleString(
-                "th-TH"
-            ) +
-            " บาท";
+        if (requiredEl) {
+
+            requiredEl.textContent =
+                required.toLocaleString(
+                    "th-TH"
+                ) +
+                " บาท";
+
+        }
 
 
-        document.getElementById(
-            "paid"
-        ).textContent =
-            paid.toLocaleString(
-                "th-TH"
-            ) +
-            " บาท";
+        if (paidEl) {
+
+            paidEl.textContent =
+                paid.toLocaleString(
+                    "th-TH"
+                ) +
+                " บาท";
+
+        }
 
 
-        document.getElementById(
-            "remaining"
-        ).textContent =
-            remaining.toLocaleString(
-                "th-TH"
-            ) +
-            " บาท";
+        if (remainingEl) {
+
+            remainingEl.textContent =
+                remaining.toLocaleString(
+                    "th-TH"
+                ) +
+                " บาท";
+
+        }
 
 
         if (status) {
 
-            if (remaining <= 0) {
+            if (
+                required > 0 &&
+                remaining <= 0
+            ) {
 
                 status.textContent =
                     "ชำระครบแล้ว ✓";
@@ -1118,7 +1412,19 @@ async function checkPayment() {
     }
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "PAYMENT CHECK ERROR:",
+            error
+        );
+
+
+        if (
+            handleAuthError(
+                error.message
+            )
+        ) {
+            return;
+        }
 
 
         if (status) {
@@ -1133,16 +1439,23 @@ async function checkPayment() {
 }
 
 
-/* =====================================================
-   QR PromptPay
-===================================================== */
+// =====================================================
+// PROMPTPAY QR
+// =====================================================
 
-function emvTag(id, value) {
+function emvTag(
+    id,
+    value
+) {
 
     return (
         id +
-        String(value.length)
-            .padStart(2, "0") +
+        String(
+            value.length
+        ).padStart(
+            2,
+            "0"
+        ) +
         value
     );
 
@@ -1151,7 +1464,8 @@ function emvTag(id, value) {
 
 function crc16(data) {
 
-    let crc = 0xFFFF;
+    let crc =
+        0xFFFF;
 
 
     for (
@@ -1170,7 +1484,9 @@ function crc16(data) {
             j++
         ) {
 
-            if (crc & 0x8000) {
+            if (
+                crc & 0x8000
+            ) {
 
                 crc =
                     (crc << 1) ^
@@ -1196,7 +1512,10 @@ function crc16(data) {
     return crc
         .toString(16)
         .toUpperCase()
-        .padStart(4, "0");
+        .padStart(
+            4,
+            "0"
+        );
 
 }
 
@@ -1208,7 +1527,10 @@ function createPromptPayPayload(
 
     let phone =
         String(mobile)
-            .replace(/\D/g, "");
+            .replace(
+                /\D/g,
+                ""
+            );
 
 
     if (
@@ -1233,7 +1555,8 @@ function createPromptPayPayload(
         );
 
 
-    let payload = "";
+    let payload =
+        "";
 
 
     payload +=
@@ -1311,43 +1634,38 @@ function createPromptPayPayload(
         "6304";
 
 
-    const crc =
-        crc16(crcInput);
-
-
     return (
         crcInput +
-        crc
+        crc16(crcInput)
     );
 
 }
 
 
+// =====================================================
+// สร้าง QR
+// =====================================================
+
 function generatePaymentQR() {
 
     const amountInput =
-        document.getElementById(
-            "amount"
-        );
+        $("amount");
 
 
     const qrContainer =
-        document.getElementById(
-            "qrcode"
-        );
+        $("qrcode");
 
 
     const qrAmount =
-        document.getElementById(
-            "qrAmount"
-        );
+        $("qrAmount");
 
 
     if (
         !amountInput ||
         !qrContainer
-    )
+    ) {
         return;
+    }
 
 
     const amount =
@@ -1373,7 +1691,6 @@ function generatePaymentQR() {
         }
 
         return;
-
     }
 
 
@@ -1386,7 +1703,6 @@ function generatePaymentQR() {
             "<p>โหลดระบบ QR ไม่สำเร็จ</p>";
 
         return;
-
     }
 
 
@@ -1400,16 +1716,17 @@ function generatePaymentQR() {
     new QRCode(
         qrContainer,
         {
+            text:
+                payload,
 
-            text: payload,
+            width:
+                260,
 
-            width: 260,
-
-            height: 260,
+            height:
+                260,
 
             correctLevel:
                 QRCode.CorrectLevel.M
-
         }
     );
 
@@ -1420,8 +1737,11 @@ function generatePaymentQR() {
             amount.toLocaleString(
                 "th-TH",
                 {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
+                    minimumFractionDigits:
+                        2,
+
+                    maximumFractionDigits:
+                        2
                 }
             ) +
             " บาท";
@@ -1434,13 +1754,12 @@ function generatePaymentQR() {
 function setupQR() {
 
     const amount =
-        document.getElementById(
-            "amount"
-        );
+        $("amount");
 
 
-    if (!amount)
+    if (!amount) {
         return;
+    }
 
 
     amount.addEventListener(
@@ -1451,29 +1770,26 @@ function setupQR() {
 }
 
 
-/* =====================================================
-   สลิป
-===================================================== */
+// =====================================================
+// อัปโหลดสลิป
+// =====================================================
 
 function setupSlipFile() {
 
     const fileInput =
-        document.getElementById(
-            "slipFile"
-        );
+        $("slipFile");
 
 
     const fileName =
-        document.getElementById(
-            "fileName"
-        );
+        $("fileName");
 
 
     if (
         !fileInput ||
         !fileName
-    )
+    ) {
         return;
+    }
 
 
     fileInput.addEventListener(
@@ -1502,14 +1818,17 @@ function setupSlipFile() {
 }
 
 
-/* =====================================================
-   บีบอัดรูป
-===================================================== */
+// =====================================================
+// บีบอัดรูป
+// =====================================================
 
 function compressImage(file) {
 
     return new Promise(
-        function (resolve, reject) {
+        function (
+            resolve,
+            reject
+        ) {
 
             const reader =
                 new FileReader();
@@ -1634,46 +1953,34 @@ function compressImage(file) {
 }
 
 
-/* =====================================================
-   ส่งข้อมูลชำระเงิน
-===================================================== */
+// =====================================================
+// ส่งแจ้งชำระเงิน
+// =====================================================
 
 async function submitPaymentData() {
 
     const number =
-        document.getElementById(
-            "paymentStudent"
-        )?.value;
+        $("paymentStudent")?.value;
 
 
     const month =
-        document.getElementById(
-            "paymentMonth"
-        )?.value;
+        $("paymentMonth")?.value;
 
 
     const amount =
-        document.getElementById(
-            "amount"
-        )?.value;
+        $("amount")?.value;
 
 
     const date =
-        document.getElementById(
-            "date"
-        )?.value;
+        $("date")?.value;
 
 
     const fileInput =
-        document.getElementById(
-            "slipFile"
-        );
+        $("slipFile");
 
 
     const status =
-        document.getElementById(
-            "submitStatus"
-        );
+        $("submitStatus");
 
 
     if (!number) {
@@ -1683,7 +1990,6 @@ async function submitPaymentData() {
         );
 
         return;
-
     }
 
 
@@ -1694,7 +2000,6 @@ async function submitPaymentData() {
         );
 
         return;
-
     }
 
 
@@ -1708,7 +2013,6 @@ async function submitPaymentData() {
         );
 
         return;
-
     }
 
 
@@ -1719,7 +2023,6 @@ async function submitPaymentData() {
         );
 
         return;
-
     }
 
 
@@ -1733,7 +2036,18 @@ async function submitPaymentData() {
         );
 
         return;
+    }
 
+
+    if (!getAuthToken()) {
+
+        alert(
+            "Session หมดอายุ กรุณาเข้าสู่ระบบใหม่"
+        );
+
+        logout();
+
+        return;
     }
 
 
@@ -1771,96 +2085,58 @@ async function submitPaymentData() {
                 image,
 
             mimeType:
-                "image/jpeg"
+                "image/jpeg",
+
+            token:
+                getAuthToken()
 
         };
 
 
         const response =
             await fetch(
-                API_URL,
+                API_URL +
+                "?_t=" +
+                Date.now(),
                 {
-
                     method:
                         "POST",
+
+                    cache:
+                        "no-store",
 
                     body:
                         JSON.stringify(
                             payload
                         )
-
                 }
             );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "เซิร์ฟเวอร์ตอบกลับ HTTP " +
+                response.status
+            );
+
+        }
 
 
         const data =
             await response.json();
 
 
-        if (data.success) {
+        if (!data.success) {
 
-            if (status) {
-
-                status.textContent =
-                    "บันทึกข้อมูลสำเร็จ ✓";
-
+            if (
+                handleAuthError(
+                    data.message
+                )
+            ) {
+                return;
             }
 
-
-            alert(
-                "แจ้งชำระเงินสำเร็จ ✓"
-            );
-
-
-            document.getElementById(
-                "paymentStudent"
-            ).value = "";
-
-
-            document.getElementById(
-                "paymentStudentName"
-            ).innerHTML =
-                '<option value="">-- เลือกชื่อ --</option>';
-
-
-            document.getElementById(
-                "paymentMonth"
-            ).value = "";
-
-
-            document.getElementById(
-                "amount"
-            ).value = "";
-
-
-            document.getElementById(
-                "date"
-            ).value = "";
-
-
-            document.getElementById(
-                "slipFile"
-            ).value = "";
-
-
-            document.getElementById(
-                "fileName"
-            ).textContent =
-                "ยังไม่ได้เลือกไฟล์";
-
-
-            document.getElementById(
-                "qrcode"
-            ).innerHTML = "";
-
-
-            document.getElementById(
-                "qrAmount"
-            ).textContent =
-                "—";
-
-        }
-        else {
 
             if (status) {
 
@@ -1876,12 +2152,136 @@ async function submitPaymentData() {
                 "ไม่สามารถบันทึกข้อมูลได้"
             );
 
+            return;
+        }
+
+
+        if (status) {
+
+            status.textContent =
+                data.message ||
+                "บันทึกข้อมูลสำเร็จ ✓";
+
+        }
+
+
+        alert(
+            data.message ||
+            "แจ้งชำระเงินสำเร็จ ✓"
+        );
+
+
+        // =================================================
+        // ล้างฟอร์ม
+        // =================================================
+
+        const paymentStudent =
+            $("paymentStudent");
+
+        if (paymentStudent) {
+
+            paymentStudent.value =
+                "";
+
+        }
+
+
+        const paymentStudentName =
+            $("paymentStudentName");
+
+        if (paymentStudentName) {
+
+            paymentStudentName.innerHTML =
+                '<option value="">-- เลือกชื่อ --</option>';
+
+        }
+
+
+        const paymentMonth =
+            $("paymentMonth");
+
+        if (paymentMonth) {
+
+            paymentMonth.value =
+                "";
+
+        }
+
+
+        const amountEl =
+            $("amount");
+
+        if (amountEl) {
+
+            amountEl.value =
+                "";
+
+        }
+
+
+        const dateEl =
+            $("date");
+
+        if (dateEl) {
+
+            dateEl.value =
+                "";
+
+        }
+
+
+        fileInput.value =
+            "";
+
+
+        const fileName =
+            $("fileName");
+
+        if (fileName) {
+
+            fileName.textContent =
+                "ยังไม่ได้เลือกไฟล์";
+
+        }
+
+
+        const qr =
+            $("qrcode");
+
+        if (qr) {
+
+            qr.innerHTML =
+                "";
+
+        }
+
+
+        const qrAmount =
+            $("qrAmount");
+
+        if (qrAmount) {
+
+            qrAmount.textContent =
+                "—";
+
         }
 
     }
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "SUBMIT PAYMENT ERROR:",
+            error
+        );
+
+
+        if (
+            handleAuthError(
+                error.message
+            )
+        ) {
+            return;
+        }
 
 
         if (status) {
@@ -1901,55 +2301,87 @@ async function submitPaymentData() {
 }
 
 
-/* =====================================================
-   ดูยอดทุกคน
-===================================================== */
+// =====================================================
+// ดูยอดทุกคน
+// =====================================================
 
 function setupOverview() {
 
     const month =
-        document.getElementById(
-            "overviewMonth"
-        );
+        $("overviewMonth");
 
 
-    if (month) {
-
-        month.addEventListener(
-            "change",
-            loadOverview
-        );
-
+    if (!month) {
+        return;
     }
+
+
+    month.addEventListener(
+        "change",
+        loadOverview
+    );
 
 }
 
 
+// =====================================================
+// โหลดข้อมูลภาพรวม
+// =====================================================
+
 async function loadOverview() {
 
     const month =
-        document.getElementById(
-            "overviewMonth"
-        )?.value;
+        $("overviewMonth")?.value;
 
 
     const grid =
-        document.getElementById(
-            "studentGrid"
-        );
+        $("studentGrid");
 
 
     const status =
-        document.getElementById(
-            "overviewStatus"
+        $("overviewStatus");
+
+
+    if (
+        !grid ||
+        !month
+    ) {
+        return;
+    }
+
+
+    // =================================================
+    // ตรวจ Token ก่อนเรียก API
+    // =================================================
+
+    const token =
+        getAuthToken();
+
+
+    if (!token) {
+
+        if (status) {
+
+            status.textContent =
+                "กรุณาเข้าสู่ระบบใหม่";
+
+        }
+
+
+        alert(
+            "ไม่พบ Session การเข้าสู่ระบบ กรุณาเข้าสู่ระบบใหม่"
         );
 
 
-    if (!grid || !month)
+        logout();
+
         return;
 
+    }
 
-    grid.innerHTML = "";
+
+    grid.innerHTML =
+        "";
 
 
     if (status) {
@@ -1963,23 +2395,67 @@ async function loadOverview() {
     try {
 
         const url =
-            API_URL +
-            "?action=overview" +
-            "&month=" +
-            encodeURIComponent(
-                month
+            buildApiUrl(
+                "overview",
+                {
+                    month:
+                        month
+                }
             );
 
 
+        console.log(
+            "OVERVIEW URL:",
+            url
+        );
+
+
+        console.log(
+            "AUTH TOKEN EXISTS:",
+            !!getAuthToken()
+        );
+
+
         const response =
-            await fetch(url);
+            await fetch(
+                url,
+                {
+                    cache:
+                        "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "เซิร์ฟเวอร์ตอบกลับ HTTP " +
+                response.status
+            );
+
+        }
 
 
         const data =
             await response.json();
 
 
+        console.log(
+            "OVERVIEW RESPONSE:",
+            data
+        );
+
+
         if (!data.success) {
+
+            if (
+                handleAuthError(
+                    data.message
+                )
+            ) {
+                return;
+            }
+
 
             throw new Error(
                 data.message ||
@@ -1990,7 +2466,7 @@ async function loadOverview() {
 
 
         renderStudentCards(
-            data.students
+            data.students || []
         );
 
 
@@ -2000,7 +2476,10 @@ async function loadOverview() {
                 "ข้อมูลประจำเดือน " +
                 month +
                 " • ทั้งหมด " +
-                data.students.length +
+                (
+                    data.students ||
+                    []
+                ).length +
                 " คน";
 
         }
@@ -2008,12 +2487,25 @@ async function loadOverview() {
     }
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "OVERVIEW ERROR:",
+            error
+        );
+
+
+        if (
+            handleAuthError(
+                error.message
+            )
+        ) {
+            return;
+        }
 
 
         if (status) {
 
             status.textContent =
+                error.message ||
                 "ไม่สามารถโหลดข้อมูลได้";
 
         }
@@ -2023,21 +2515,41 @@ async function loadOverview() {
 }
 
 
+// =====================================================
+// สร้าง Card นักเรียน
+// =====================================================
+
 function renderStudentCards(
     data
 ) {
 
     const grid =
-        document.getElementById(
-            "studentGrid"
-        );
+        $("studentGrid");
 
 
-    if (!grid)
+    if (!grid) {
+        return;
+    }
+
+
+    grid.innerHTML =
+        "";
+
+
+    if (
+        !Array.isArray(data) ||
+        data.length === 0
+    ) {
+
+        grid.innerHTML = `
+            <div class="empty-student">
+                ไม่พบข้อมูลนักเรียน
+            </div>
+        `;
+
         return;
 
-
-    grid.innerHTML = "";
+    }
 
 
     data.forEach(
@@ -2082,6 +2594,10 @@ function renderStudentCards(
                 required > 0;
 
 
+            // =================================================
+            // สร้าง Card
+            // =================================================
+
             card.innerHTML = `
 
                 <div class="student-avatar">
@@ -2100,12 +2616,11 @@ function renderStudentCards(
                     )}
                 </div>
 
-                <div class="student-balance
-                    ${
-                        complete
-                            ? "paid-status"
-                            : "unpaid-status"
-                    }">
+                <div class="student-balance ${
+                    complete
+                        ? "paid-status"
+                        : "unpaid-status"
+                }">
 
                     ${
                         complete
@@ -2144,18 +2659,16 @@ function renderStudentCards(
 }
 
 
-/* =====================================================
-   รายละเอียดนักเรียน
-===================================================== */
+// =====================================================
+// รายละเอียดนักเรียน
+// =====================================================
 
 function showStudentDetail(
     student
 ) {
 
     const modal =
-        document.getElementById(
-            "studentModal"
-        );
+        $("studentModal");
 
 
     const required =
@@ -2178,81 +2691,113 @@ function showStudentDetail(
         );
 
 
-    document.getElementById(
-        "detailNumber"
-    ).textContent =
-        "เลขที่ " +
-        student.number;
+    const detailNumber =
+        $("detailNumber");
 
 
-    document.getElementById(
-        "detailName"
-    ).textContent =
-        student.name;
+    const detailName =
+        $("detailName");
 
 
-    document.getElementById(
-        "detailRequired"
-    ).textContent =
-        required.toLocaleString(
-            "th-TH"
-        ) +
-        " บาท";
+    const detailRequired =
+        $("detailRequired");
 
 
-    document.getElementById(
-        "detailPaid"
-    ).textContent =
-        paid.toLocaleString(
-            "th-TH"
-        ) +
-        " บาท";
+    const detailPaid =
+        $("detailPaid");
 
 
-    document.getElementById(
-        "detailRemaining"
-    ).textContent =
-        remaining.toLocaleString(
-            "th-TH"
-        ) +
-        " บาท";
+    const detailRemaining =
+        $("detailRemaining");
 
 
     const detailStatus =
-        document.getElementById(
-            "detailStatus"
-        );
+        $("detailStatus");
 
 
-    if (
-        required > 0 &&
-        remaining <= 0
-    ) {
+    if (detailNumber) {
 
-        detailStatus.textContent =
-            "ชำระครบแล้ว ✓";
-
-        detailStatus.style.background =
-            "#e4f6ec";
-
-        detailStatus.style.color =
-            "#23774d";
+        detailNumber.textContent =
+            "เลขที่ " +
+            student.number;
 
     }
-    else {
 
-        detailStatus.textContent =
-            "ยังมียอดค้าง " +
+
+    if (detailName) {
+
+        detailName.textContent =
+            student.name;
+
+    }
+
+
+    if (detailRequired) {
+
+        detailRequired.textContent =
+            required.toLocaleString(
+                "th-TH"
+            ) +
+            " บาท";
+
+    }
+
+
+    if (detailPaid) {
+
+        detailPaid.textContent =
+            paid.toLocaleString(
+                "th-TH"
+            ) +
+            " บาท";
+
+    }
+
+
+    if (detailRemaining) {
+
+        detailRemaining.textContent =
             remaining.toLocaleString(
                 "th-TH"
             ) +
             " บาท";
 
-        detailStatus.style.background =
-            "#fff0ed";
+    }
 
-        detailStatus.style.color =
-            "#bd574b";
+
+    if (detailStatus) {
+
+        if (
+            required > 0 &&
+            remaining <= 0
+        ) {
+
+            detailStatus.textContent =
+                "ชำระครบแล้ว ✓";
+
+            detailStatus.style.background =
+                "#e4f6ec";
+
+            detailStatus.style.color =
+                "#23774d";
+
+        }
+        else {
+
+            detailStatus.textContent =
+                "ยังมียอดค้าง " +
+                remaining.toLocaleString(
+                    "th-TH"
+                ) +
+                " บาท";
+
+            detailStatus.style.background =
+                "#fff0ed";
+
+            detailStatus.style.color =
+                "#bd574b";
+
+        }
 
     }
 
@@ -2267,12 +2812,14 @@ function showStudentDetail(
 }
 
 
+// =====================================================
+// ปิด Modal
+// =====================================================
+
 function closeStudentModal() {
 
     const modal =
-        document.getElementById(
-            "studentModal"
-        );
+        $("studentModal");
 
 
     if (modal) {
@@ -2285,9 +2832,9 @@ function closeStudentModal() {
 }
 
 
-/* =====================================================
-   ป้องกัน HTML แปลก ๆ จากชื่อ
-===================================================== */
+// =====================================================
+// ป้องกัน HTML Injection
+// =====================================================
 
 function escapeHtml(
     text
