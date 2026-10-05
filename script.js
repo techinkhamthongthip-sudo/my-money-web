@@ -2659,18 +2659,22 @@ function renderStudentCards(
 // รายละเอียดนักเรียน
 // =====================================================
 
-function showStudentDetail(
-    student
-) {
+function showStudentDetail(student) {
 
-    const modal =
-        $("studentModal");
+    const modal = $("studentModal");
 
+    const detailPhoto = $("detailPhoto");
 
+    if (detailPhoto) {
+        detailPhoto.src =
+            `images/${String(student.number).trim()}.jpg`;
+
+        detailPhoto.alt =
+            student.name || "รูปนักเรียน";
+
+    }
     const required =
-        Number(
-            student.required
-        ) || 0;
+        Number(student.required) || 0;
 
 
     const paid =
