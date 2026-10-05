@@ -2450,39 +2450,38 @@ body {
 
 }
 
-.student-avatar {
+/* รูปนักเรียนในการ์ด */
+#overviewPage .student-avatar {
     width: 72px;
     height: 72px;
     border-radius: 50%;
     overflow: hidden;
-    margin: 0 auto 10px;
 }
 
-.student-avatar img {
+#overviewPage .student-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     display: block;
+    border-radius: 50%;
 }
+
 
 /* รูปนักเรียนในหน้ารายละเอียด */
 #studentModal .modal-avatar {
-    position: relative;
     width: 90px;
     height: 90px;
-    margin: 0 auto 12px;
     border-radius: 50%;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin: 0 auto 12px;
 }
 
 #studentModal .modal-avatar img {
     width: 100%;
     height: 100%;
-    max-width: none;
     object-fit: cover;
-    border-radius: 50%;
+    object-position: center;
     display: block;
+    border-radius: 50%;
 }
