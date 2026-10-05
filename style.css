@@ -2464,3 +2464,25 @@ body {
     object-fit: cover;
     display: block;
 }
+
+/* รูปนักเรียนในหน้ารายละเอียด */
+#studentModal .modal-avatar {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#studentModal .modal-avatar img {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
