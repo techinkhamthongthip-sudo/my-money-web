@@ -34,7 +34,7 @@ const $ = (id) =>
 
 document.addEventListener(
     "DOMContentLoaded",
-    function () {
+    async function () {
 
         hideAllPages();
 
@@ -50,9 +50,11 @@ document.addEventListener(
         setupSlipFile();
         setupOverview();
 
+        // เริ่มพื้นหลังเอียงตั้งแต่หน้าแรก
+        await startTiltBackground();
+
     }
 );
-
 
 // =====================================================
 // ซ่อนทุกหน้า
@@ -412,9 +414,6 @@ async function checkAccessCode() {
             "M515_AUTH_TOKEN",
             AUTH_TOKEN
         );
-
-        // เริ่มระบบเอียงพื้นหลัง
-        await startTiltBackground();
 
         // =================================================
         // โหลดข้อมูลหลัง Login
