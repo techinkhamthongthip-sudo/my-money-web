@@ -37,7 +37,6 @@ body {
 
     background-size: cover;
     background-position: 50% center;
-    transition: background-position 0.1s linear;
     background-repeat: no-repeat;
 }
 
