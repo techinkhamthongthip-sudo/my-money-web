@@ -2451,6 +2451,14 @@ body {
 
 }
 
+.student-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 10px;
+}
+
 /* รูปนักเรียนในการ์ด */
 #overviewPage .student-avatar {
     width: 72px;
@@ -2485,14 +2493,4 @@ body {
     object-position: center;
     display: block;
     border-radius: 50%;
-}
-
-/* =====================================================
-   📱 หน้าแรก รองรับการเอียงจอ
-===================================================== */
-
-.welcome-screen {
-    background-size: cover;
-    background-position: 50% center;
-    transition: background-position 0.1s linear;
 }
