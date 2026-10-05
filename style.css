@@ -32,14 +32,46 @@ body {
     position: relative;
     overflow: hidden;
 
+    /* สำคัญ: เอารูปออกจาก welcome-screen
+       เพราะ JavaScript จะขยับ .welcome-background */
+    background: #24152f;
+}
+
+
+/* =====================================================
+   พื้นหลังหน้าแรก
+   ใช้ร่วมกับ JavaScript สำหรับเอียงตาม iPhone
+===================================================== */
+
+.welcome-background {
+    position: absolute;
+
+    /* ขยายเกินหน้าจอเพื่อให้ขยับแล้วไม่เห็นขอบ */
+    top: -15%;
+    left: -15%;
+    width: 130%;
+    height: 130%;
+
     background-image:
         url("IMG_8121.jpeg");
 
     background-size: cover;
-    background-position: 50% center;
+    background-position: center;
     background-repeat: no-repeat;
+
+    transform: translate3d(0, 0, 0);
+
+    will-change: transform;
+
+    z-index: 0;
+
+    pointer-events: none;
 }
 
+
+/* =====================================================
+   Overlay
+===================================================== */
 
 .welcome-overlay {
     position: absolute;
@@ -54,8 +86,14 @@ body {
         );
 
     z-index: 1;
+
+    pointer-events: none;
 }
 
+
+/* =====================================================
+   เนื้อหาหน้าแรก
+===================================================== */
 
 .welcome-content {
     width: min(90%, 700px);
@@ -994,11 +1032,11 @@ body {
 
 }
 
+
 /* =====================================================
    🎨 HOME PAGE - PREMIUM COLORFUL
 ===================================================== */
 
-/* พื้นหลังหน้า Home */
 .home-page {
     position: relative;
     overflow: hidden;
@@ -1028,7 +1066,6 @@ body {
 }
 
 
-/* แสงตกแต่งด้านหลัง */
 .home-page::before {
     content: "";
 
@@ -1077,7 +1114,6 @@ body {
 }
 
 
-/* ให้เนื้อหาอยู่เหนือเอฟเฟกต์ */
 .home-page .main-container {
     position: relative;
     z-index: 2;
@@ -1158,7 +1194,6 @@ body {
 }
 
 
-/* โลโก้ */
 .header-logo {
     width: 82px;
     height: 82px;
@@ -1198,7 +1233,6 @@ body {
 }
 
 
-/* การ์ดทุกใบ */
 .menu-card {
     position: relative;
 
@@ -1223,7 +1257,6 @@ body {
 }
 
 
-/* แถบสีด้านบน */
 .menu-card::before {
     content: "";
 
@@ -1248,7 +1281,6 @@ body {
 }
 
 
-/* แสงวิ่ง */
 .menu-card::after {
     content: "";
 
@@ -1322,9 +1354,8 @@ body {
 }
 
 
-/* การ์ด 1 */
-.menu-card:nth-child(1)
-.menu-icon {
+/* แก้ selector ให้ถูกต้อง */
+.menu-card:nth-child(1) .menu-icon {
     background:
         linear-gradient(
             135deg,
@@ -1339,9 +1370,7 @@ body {
 }
 
 
-/* การ์ด 2 */
-.menu-card:nth-child(2)
-.menu-icon {
+.menu-card:nth-child(2) .menu-icon {
     background:
         linear-gradient(
             135deg,
@@ -1356,9 +1385,7 @@ body {
 }
 
 
-/* การ์ด 3 */
-.menu-card:nth-child(3)
-.menu-icon {
+.menu-card:nth-child(3) .menu-icon {
     background:
         linear-gradient(
             135deg,
@@ -1522,14 +1549,9 @@ body {
 
 }
 
+
 /* =====================================================
    🌈 COLORFUL INNER PAGES
-   ตรวจสอบยอด / แจ้งชำระ / ดูยอดทุกคน
-===================================================== */
-
-
-/* =====================================================
-   🌟 พื้นหลังแต่ละฟังก์ชัน
 ===================================================== */
 
 #checkPage {
@@ -1595,16 +1617,14 @@ body {
 }
 
 
-/* =====================================================
-   🔙 ปุ่มกลับ
-===================================================== */
-
-#checkPage .back-button {
+#checkPage .back-button,
+#paymentPage .back-button,
+#overviewPage .back-button {
     padding: 10px 18px;
 
     border-radius: 12px;
 
-    background: rgba(255,255,255,.75);
+    background: rgba(255,255,255,.8);
 
     box-shadow:
         0 5px 18px rgba(80,40,110,.08);
@@ -1615,36 +1635,12 @@ body {
 
 
 #paymentPage .back-button {
-    padding: 10px 18px;
-
-    border-radius: 12px;
-
-    background: rgba(255,255,255,.8);
-
     color: #24749c;
-
-    box-shadow:
-        0 5px 18px rgba(30,100,130,.08);
-
-    transition:
-        .25s ease;
 }
 
 
 #overviewPage .back-button {
-    padding: 10px 18px;
-
-    border-radius: 12px;
-
-    background: rgba(255,255,255,.8);
-
     color: #8a438d;
-
-    box-shadow:
-        0 5px 18px rgba(100,40,110,.08);
-
-    transition:
-        .25s ease;
 }
 
 
@@ -1654,10 +1650,6 @@ body {
     transform: translateX(-5px);
 }
 
-
-/* =====================================================
-   🎨 หัวข้อแต่ละหน้า
-===================================================== */
 
 #checkPage .section-title {
     color: #54247a;
@@ -1682,10 +1674,6 @@ body {
         0 4px 15px rgba(160,70,140,.12);
 }
 
-
-/* =====================================================
-   💎 กล่องฟอร์ม
-===================================================== */
 
 #checkPage .form-card {
     border:
@@ -1769,10 +1757,6 @@ body {
 }
 
 
-/* =====================================================
-   📝 Label
-===================================================== */
-
 #checkPage .form-card label {
     color: #663a7d;
 }
@@ -1782,10 +1766,6 @@ body {
     color: #286d89;
 }
 
-
-/* =====================================================
-   🔽 Select / Input
-===================================================== */
 
 #checkPage .form-card select,
 #checkPage .form-card input {
@@ -1857,10 +1837,6 @@ body {
 }
 
 
-/* =====================================================
-   💰 ตรวจสอบยอด - Summary
-===================================================== */
-
 #checkPage .payment-summary {
     margin-top: 30px;
 }
@@ -1885,7 +1861,6 @@ body {
 }
 
 
-/* ยอดต้องจ่าย */
 #checkPage .summary-item:nth-child(1) {
     background:
         linear-gradient(
@@ -1901,7 +1876,6 @@ body {
 }
 
 
-/* จ่ายแล้ว */
 #checkPage .summary-item:nth-child(2) {
     background:
         linear-gradient(
@@ -1917,7 +1891,6 @@ body {
 }
 
 
-/* คงเหลือ */
 #checkPage .summary-item:nth-child(3) {
     background:
         linear-gradient(
@@ -1932,10 +1905,6 @@ body {
     color: #c47b18;
 }
 
-
-/* =====================================================
-   📢 Status ตรวจสอบยอด
-===================================================== */
 
 #checkPage #status {
     padding: 14px 18px;
@@ -1955,10 +1924,6 @@ body {
         1px solid rgba(130,80,170,.12);
 }
 
-
-/* =====================================================
-   💳 QR Section
-===================================================== */
 
 #paymentPage .qr-section {
     margin-top: 30px;
@@ -2023,10 +1988,6 @@ body {
 }
 
 
-/* =====================================================
-   📎 ช่องเลือกสลิป
-===================================================== */
-
 #paymentPage #slipFile {
     padding: 10px;
 
@@ -2035,10 +1996,6 @@ body {
     border-radius: 12px;
 }
 
-
-/* =====================================================
-   ✅ ปุ่มแจ้งชำระ
-===================================================== */
 
 #paymentPage .submit-button {
     background:
@@ -2075,10 +2032,6 @@ body {
     border-radius: 12px;
 }
 
-
-/* =====================================================
-   👥 ดูยอดทุกคน
-===================================================== */
 
 #overviewPage .overview-container {
     position: relative;
@@ -2154,10 +2107,6 @@ body {
 }
 
 
-/* =====================================================
-   🧑‍🎓 Student Cards
-===================================================== */
-
 #overviewPage .student-card {
     position: relative;
 
@@ -2214,7 +2163,6 @@ body {
 }
 
 
-/* Avatar */
 #overviewPage .student-avatar {
     background:
         linear-gradient(
@@ -2231,27 +2179,24 @@ body {
 }
 
 
-#overviewPage .student-card:hover
-.student-avatar {
+/* แก้ selector ให้ hover รูปทำงาน */
+#overviewPage .student-card:hover .student-avatar {
     transform:
         scale(1.1)
         rotate(-5deg);
 }
 
 
-/* เลขที่ */
 #overviewPage .student-number {
     color: #98769a;
 }
 
 
-/* ชื่อ */
 #overviewPage .student-name {
     color: #422542;
 }
 
 
-/* จ่ายครบ */
 #overviewPage .paid-status {
     padding: 6px 9px;
 
@@ -2264,7 +2209,6 @@ body {
 }
 
 
-/* ยังไม่ครบ */
 #overviewPage .unpaid-status {
     padding: 6px 9px;
 
@@ -2276,10 +2220,6 @@ body {
     color: #c26543;
 }
 
-
-/* =====================================================
-   🪟 Modal
-===================================================== */
 
 #studentModal {
     background:
@@ -2450,46 +2390,66 @@ body {
 
 }
 
+
+/* =====================================================
+   รูปนักเรียน
+===================================================== */
+
 .student-avatar {
     width: 72px;
     height: 72px;
+
     border-radius: 50%;
+
     overflow: hidden;
+
     margin: 0 auto 10px;
 }
 
-/* รูปนักเรียนในการ์ด */
+
 #overviewPage .student-avatar {
     width: 72px;
     height: 72px;
+
     border-radius: 50%;
+
     overflow: hidden;
 }
+
 
 #overviewPage .student-avatar img {
     width: 100%;
     height: 100%;
+
     object-fit: cover;
     object-position: center;
+
     display: block;
+
     border-radius: 50%;
 }
 
 
-/* รูปนักเรียนในหน้ารายละเอียด */
 #studentModal .modal-avatar {
     width: 90px;
     height: 90px;
+
     border-radius: 50%;
+
     overflow: hidden;
+
     margin: 0 auto 12px;
 }
+
 
 #studentModal .modal-avatar img {
     width: 100%;
     height: 100%;
+
     object-fit: cover;
     object-position: center;
+
     display: block;
+
     border-radius: 50%;
 }
