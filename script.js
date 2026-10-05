@@ -1,6 +1,7 @@
 // =====================================================
 // ระบบบริหารเงินประจำห้อง ม.5/15
 // SCRIPT.JS — V3 AUTHENTICATION + SMOOTH TILT FIX
+// iPhone Motion Permission FIX
 // =====================================================
 
 const API_URL =
@@ -17,7 +18,10 @@ let AUTH_TOKEN =
     sessionStorage.getItem("M515_AUTH_TOKEN") || "";
 
 let students = [];
+
 let tiltStarted = false;
+
+let tiltPermissionRequested = false;
 
 
 // =====================================================
@@ -38,21 +42,28 @@ document.addEventListener(
 
         hideAllPages();
 
-        const welcome = $("welcomeScreen");
+        const welcome =
+            $("welcomeScreen");
 
         if (welcome) {
-            welcome.style.display = "flex";
+
+            welcome.style.display =
+                "flex";
+
         }
 
         setupLogin();
+
         setupButtons();
+
         setupQR();
+
         setupSlipFile();
+
         setupOverview();
 
         // =================================================
-        // เริ่มระบบเอียงเมื่อผู้ใช้แตะหน้าจอ
-        // สำคัญสำหรับ iPhone / iPad
+        // ตั้งค่าปุ่ม Motion สำหรับ iPhone / iPad
         // =================================================
 
         setupTiltPermission();
@@ -78,10 +89,14 @@ function hideAllPages() {
     pages.forEach(
         function (id) {
 
-            const el = $(id);
+            const el =
+                $(id);
 
             if (el) {
-                el.style.display = "none";
+
+                el.style.display =
+                    "none";
+
             }
 
         }
@@ -97,7 +112,10 @@ function hideAllPages() {
 function getAuthToken() {
 
     return (
-        String(AUTH_TOKEN || "").trim() ||
+        String(
+            AUTH_TOKEN || ""
+        ).trim() ||
+
         String(
             sessionStorage.getItem(
                 "M515_AUTH_TOKEN"
@@ -115,7 +133,9 @@ function getAuthToken() {
 function isAuthError(message) {
 
     const msg =
-        String(message || "");
+        String(
+            message || ""
+        );
 
     return (
         msg.includes("ไม่ได้เข้าสู่ระบบ") ||
@@ -135,7 +155,9 @@ function isAuthError(message) {
 function handleAuthError(message) {
 
     if (!isAuthError(message)) {
+
         return false;
+
     }
 
     AUTH_TOKEN = "";
@@ -248,7 +270,9 @@ function setupLogin() {
         $("confirmCode");
 
     if (!input || !button) {
+
         return;
+
     }
 
     button.addEventListener(
@@ -260,7 +284,9 @@ function setupLogin() {
         "keydown",
         function (event) {
 
-            if (event.key === "Enter") {
+            if (
+                event.key === "Enter"
+            ) {
 
                 checkAccessCode();
 
@@ -285,7 +311,9 @@ async function checkAccessCode() {
         $("codeMessage");
 
     if (!input) {
+
         return;
+
     }
 
     const code =
@@ -303,6 +331,7 @@ async function checkAccessCode() {
         input.focus();
 
         return;
+
     }
 
     try {
@@ -318,7 +347,8 @@ async function checkAccessCode() {
             buildApiUrl(
                 "login",
                 {
-                    code: code
+                    code:
+                        code
                 }
             );
 
@@ -326,7 +356,8 @@ async function checkAccessCode() {
             await fetch(
                 url,
                 {
-                    cache: "no-store"
+                    cache:
+                        "no-store"
                 }
             );
 
@@ -352,11 +383,13 @@ async function checkAccessCode() {
 
             }
 
-            input.value = "";
+            input.value =
+                "";
 
             input.focus();
 
             return;
+
         }
 
         if (!data.token) {
@@ -400,13 +433,17 @@ async function checkAccessCode() {
 
         }
 
-        input.disabled = true;
+        input.disabled =
+            true;
 
         const button =
             $("confirmCode");
 
         if (button) {
-            button.disabled = true;
+
+            button.disabled =
+                true;
+
         }
 
 
@@ -443,10 +480,14 @@ async function checkAccessCode() {
                     }
                 ],
                 {
-                    duration: 1800,
+                    duration:
+                        1800,
+
                     easing:
                         "cubic-bezier(.2,.8,.2,1)",
-                    fill: "forwards"
+
+                    fill:
+                        "forwards"
                 }
             );
 
@@ -468,20 +509,29 @@ async function checkAccessCode() {
                     welcome.animate(
                         [
                             {
-                                opacity: 1,
+                                opacity:
+                                    1,
+
                                 transform:
                                     "scale(1)"
                             },
                             {
-                                opacity: 0,
+                                opacity:
+                                    0,
+
                                 transform:
                                     "scale(1.04)"
                             }
                         ],
                         {
-                            duration: 600,
-                            easing: "ease-in",
-                            fill: "forwards"
+                            duration:
+                                600,
+
+                            easing:
+                                "ease-in",
+
+                            fill:
+                                "forwards"
                         }
                     );
 
@@ -508,19 +558,26 @@ async function checkAccessCode() {
                     home.animate(
                         [
                             {
-                                opacity: 0,
+                                opacity:
+                                    0,
+
                                 transform:
                                     "translateY(20px)"
                             },
                             {
-                                opacity: 1,
+                                opacity:
+                                    1,
+
                                 transform:
                                     "translateY(0)"
                             }
                         ],
                         {
-                            duration: 500,
-                            easing: "ease-out"
+                            duration:
+                                500,
+
+                            easing:
+                                "ease-out"
                         }
                     );
 
@@ -716,7 +773,8 @@ function setupButtons() {
             function (event) {
 
                 if (
-                    event.target === modal
+                    event.target ===
+                    modal
                 ) {
 
                     closeStudentModal();
@@ -834,7 +892,8 @@ async function loadStudents() {
             await fetch(
                 url,
                 {
-                    cache: "no-store"
+                    cache:
+                        "no-store"
                 }
             );
 
@@ -857,7 +916,9 @@ async function loadStudents() {
                     data.message
                 )
             ) {
+
                 return;
+
             }
 
             throw new Error(
@@ -992,7 +1053,9 @@ function updateCheckStudentName() {
         $("studentName");
 
     if (!nameSelect) {
+
         return;
+
     }
 
     nameSelect.innerHTML =
@@ -1044,7 +1107,9 @@ function updatePaymentStudentName() {
         $("paymentStudentName");
 
     if (!nameSelect) {
+
         return;
+
     }
 
     nameSelect.innerHTML =
@@ -1117,26 +1182,35 @@ async function checkPayment() {
     ) {
 
         if (requiredEl) {
+
             requiredEl.textContent =
                 "0 บาท";
+
         }
 
         if (paidEl) {
+
             paidEl.textContent =
                 "0 บาท";
+
         }
 
         if (remainingEl) {
+
             remainingEl.textContent =
                 "0 บาท";
+
         }
 
         if (status) {
+
             status.textContent =
                 "กรุณาเลือกเลขที่ ชื่อ และเดือน";
+
         }
 
         return;
+
     }
 
     if (!getAuthToken()) {
@@ -1170,7 +1244,8 @@ async function checkPayment() {
             await fetch(
                 url,
                 {
-                    cache: "no-store"
+                    cache:
+                        "no-store"
                 }
             );
 
@@ -1193,7 +1268,9 @@ async function checkPayment() {
                     data.message
                 )
             ) {
+
                 return;
+
             }
 
             if (status) {
@@ -1205,6 +1282,7 @@ async function checkPayment() {
             }
 
             return;
+
         }
 
         const required =
@@ -1219,7 +1297,8 @@ async function checkPayment() {
 
         const remaining =
             Math.max(
-                required - paid,
+                required -
+                paid,
                 0
             );
 
@@ -1290,7 +1369,9 @@ async function checkPayment() {
                 error.message
             )
         ) {
+
             return;
+
         }
 
         if (status) {
@@ -1509,7 +1590,9 @@ function generatePaymentQR() {
         !amountInput ||
         !qrContainer
     ) {
+
         return;
+
     }
 
     const amount =
@@ -1533,6 +1616,7 @@ function generatePaymentQR() {
         }
 
         return;
+
     }
 
     if (
@@ -1544,6 +1628,7 @@ function generatePaymentQR() {
             "<p>โหลดระบบ QR ไม่สำเร็จ</p>";
 
         return;
+
     }
 
     const payload =
@@ -1595,7 +1680,9 @@ function setupQR() {
         $("amount");
 
     if (!amount) {
+
         return;
+
     }
 
     amount.addEventListener(
@@ -1622,7 +1709,9 @@ function setupSlipFile() {
         !fileInput ||
         !fileName
     ) {
+
         return;
+
     }
 
     fileInput.addEventListener(
@@ -1802,6 +1891,7 @@ async function submitPaymentData() {
         );
 
         return;
+
     }
 
     if (!month) {
@@ -1811,6 +1901,7 @@ async function submitPaymentData() {
         );
 
         return;
+
     }
 
     if (
@@ -1823,6 +1914,7 @@ async function submitPaymentData() {
         );
 
         return;
+
     }
 
     if (!date) {
@@ -1832,6 +1924,7 @@ async function submitPaymentData() {
         );
 
         return;
+
     }
 
     if (
@@ -1844,6 +1937,7 @@ async function submitPaymentData() {
         );
 
         return;
+
     }
 
     if (!getAuthToken()) {
@@ -1855,6 +1949,7 @@ async function submitPaymentData() {
         logout();
 
         return;
+
     }
 
     try {
@@ -1934,7 +2029,9 @@ async function submitPaymentData() {
                     data.message
                 )
             ) {
+
                 return;
+
             }
 
             if (status) {
@@ -1951,6 +2048,7 @@ async function submitPaymentData() {
             );
 
             return;
+
         }
 
         if (status) {
@@ -2063,7 +2161,9 @@ async function submitPaymentData() {
                 error.message
             )
         ) {
+
             return;
+
         }
 
         if (status) {
@@ -2092,7 +2192,9 @@ function setupOverview() {
         $("overviewMonth");
 
     if (!month) {
+
         return;
+
     }
 
     month.addEventListener(
@@ -2122,7 +2224,9 @@ async function loadOverview() {
         !grid ||
         !month
     ) {
+
         return;
+
     }
 
     const token =
@@ -2211,7 +2315,9 @@ async function loadOverview() {
                     data.message
                 )
             ) {
+
                 return;
+
             }
 
             throw new Error(
@@ -2252,7 +2358,9 @@ async function loadOverview() {
                 error.message
             )
         ) {
+
             return;
+
         }
 
         if (status) {
@@ -2280,7 +2388,9 @@ function renderStudentCards(
         $("studentGrid");
 
     if (!grid) {
+
         return;
+
     }
 
     grid.innerHTML =
@@ -2308,7 +2418,9 @@ function renderStudentCards(
                 `images/${student.number}.jpg`;
 
             const card =
-                document.createElement("button");
+                document.createElement(
+                    "button"
+                );
 
             card.className =
                 "student-card";
@@ -2337,22 +2449,29 @@ function renderStudentCards(
             card.innerHTML = `
 
                 <div class="student-avatar">
+
                     <img
                         src="${photo}"
                         alt="${escapeHtml(student.name)}"
+                        onerror="this.style.display='none';"
                     >
+
                 </div>
 
                 <div class="student-number">
+
                     เลขที่ ${escapeHtml(
                         student.number
                     )}
+
                 </div>
 
                 <div class="student-name">
+
                     ${escapeHtml(
                         student.name
                     )}
+
                 </div>
 
                 <div class="student-balance ${
@@ -2400,7 +2519,9 @@ function renderStudentCards(
 // รายละเอียดนักเรียน
 // =====================================================
 
-function showStudentDetail(student) {
+function showStudentDetail(
+    student
+) {
 
     const modal =
         $("studentModal");
@@ -2411,7 +2532,9 @@ function showStudentDetail(student) {
     if (detailPhoto) {
 
         detailPhoto.src =
-            `images/${String(student.number).trim()}.jpg`;
+            `images/${String(
+                student.number
+            ).trim()}.jpg`;
 
         detailPhoto.alt =
             student.name ||
@@ -2567,11 +2690,20 @@ function closeStudentModal() {
 // =====================================================
 // พื้นหลังขยับตามการเอียงมือถือ
 // =====================================================
+//
+// สำคัญ:
+// ฟังก์ชันนี้ "ไม่ขอ Permission"
+// เพราะ iPhone ต้องให้ requestPermission()
+// ถูกเรียกจากการกดของผู้ใช้โดยตรง
+//
+// =====================================================
 
-async function startTiltBackground() {
+function startTiltBackground() {
 
     if (tiltStarted) {
+
         return true;
+
     }
 
     const welcome =
@@ -2582,71 +2714,38 @@ async function startTiltBackground() {
             ".welcome-background"
         );
 
-    if (!welcome || !background) {
+    if (
+        !welcome ||
+        !background
+    ) {
 
         console.warn(
             "ไม่พบ welcomeScreen หรือ welcome-background"
         );
 
         return false;
-    }
-
-
-    // =================================================
-    // ขอสิทธิ์ Motion สำหรับ iPhone / iPad
-    // =================================================
-
-    if (
-        typeof DeviceOrientationEvent !== "undefined" &&
-        typeof DeviceOrientationEvent.requestPermission === "function"
-    ) {
-
-        try {
-
-            const permission =
-                await DeviceOrientationEvent.requestPermission();
-
-            if (
-                permission !== "granted"
-            ) {
-
-                console.warn(
-                    "ไม่ได้รับสิทธิ์ Motion"
-                );
-
-                return false;
-
-            }
-
-        }
-        catch (error) {
-
-            console.error(
-                "ไม่สามารถขอสิทธิ์ Motion ได้:",
-                error
-            );
-
-            return false;
-
-        }
 
     }
-
-
-    tiltStarted = true;
 
 
     // =================================================
     // ค่าการเคลื่อนไหว
     // =================================================
 
-    let targetX = 0;
-    let currentX = 0;
+    let targetX =
+        0;
 
-    let targetY = 0;
-    let currentY = 0;
+    let currentX =
+        0;
 
-    let animationRunning = false;
+    let targetY =
+        0;
+
+    let currentY =
+        0;
+
+    let animationRunning =
+        false;
 
 
     // =================================================
@@ -2656,10 +2755,16 @@ async function startTiltBackground() {
     function updateBackground() {
 
         currentX +=
-            (targetX - currentX) * 0.12;
+            (
+                targetX -
+                currentX
+            ) * 0.10;
 
         currentY +=
-            (targetY - currentY) * 0.12;
+            (
+                targetY -
+                currentY
+            ) * 0.10;
 
 
         background.style.transform =
@@ -2667,8 +2772,15 @@ async function startTiltBackground() {
 
 
         if (
-            Math.abs(targetX - currentX) > 0.05 ||
-            Math.abs(targetY - currentY) > 0.05
+            Math.abs(
+                targetX -
+                currentX
+            ) > 0.05 ||
+
+            Math.abs(
+                targetY -
+                currentY
+            ) > 0.05
         ) {
 
             requestAnimationFrame(
@@ -2678,7 +2790,8 @@ async function startTiltBackground() {
         }
         else {
 
-            animationRunning = false;
+            animationRunning =
+                false;
 
         }
 
@@ -2689,59 +2802,102 @@ async function startTiltBackground() {
     // ตรวจจับการเอียง
     // =================================================
 
+    function handleOrientation(
+        event
+    ) {
+
+        let gamma =
+            Number(
+                event.gamma
+            ) || 0;
+
+        let beta =
+            Number(
+                event.beta
+            ) || 0;
+
+
+        // จำกัดค่าเพื่อไม่ให้ภาพหมุนแรงเกินไป
+        gamma =
+            Math.max(
+                -30,
+                Math.min(
+                    30,
+                    gamma
+                )
+            );
+
+
+        beta =
+            Math.max(
+                -30,
+                Math.min(
+                    30,
+                    beta - 45
+                )
+            );
+
+
+        // เพิ่มระยะให้เห็นการขยับชัดเจนบนมือถือ
+        targetX =
+            (
+                gamma /
+                30
+            ) * 70;
+
+        targetY =
+            (
+                beta /
+                30
+            ) * 45;
+
+
+        if (
+            !animationRunning
+        ) {
+
+            animationRunning =
+                true;
+
+            requestAnimationFrame(
+                updateBackground
+            );
+
+        }
+
+    }
+
+
+    // =================================================
+    // Device Orientation
+    // =================================================
+
     window.addEventListener(
         "deviceorientation",
-        function (event) {
-
-            let gamma =
-                event.gamma || 0;
-
-            let beta =
-                event.beta || 0;
-
-
-            gamma =
-                Math.max(
-                    -30,
-                    Math.min(
-                        30,
-                        gamma
-                    )
-                );
-
-
-            beta =
-                Math.max(
-                    -30,
-                    Math.min(
-                        30,
-                        beta - 45
-                    )
-                );
-
-
-            targetX =
-                (gamma / 30) * 30;
-
-            targetY =
-                (beta / 30) * 20;
-
-
-            if (!animationRunning) {
-
-                animationRunning = true;
-
-                requestAnimationFrame(
-                    updateBackground
-                );
-
-            }
-
-        },
+        handleOrientation,
         {
-            passive: true
+            passive:
+                true
         }
     );
+
+
+    // =================================================
+    // บาง iPhone / Browser ใช้ absolute orientation
+    // =================================================
+
+    window.addEventListener(
+        "deviceorientationabsolute",
+        handleOrientation,
+        {
+            passive:
+                true
+        }
+    );
+
+
+    tiltStarted =
+        true;
 
 
     console.log(
@@ -2754,43 +2910,194 @@ async function startTiltBackground() {
 
 
 // =====================================================
-// ขอสิทธิ์ Motion จากการแตะหน้าจอ
-// สำคัญสำหรับ iPhone / iPad
+// iPHONE / iPAD MOTION PERMISSION
+// =====================================================
+//
+// สำคัญมาก:
+//
+// iPhone ไม่อนุญาตให้เรียก
+// DeviceOrientationEvent.requestPermission()
+// แบบสุ่มจากหน้าเว็บ
+//
+// ต้องเรียกจากการกดปุ่มของผู้ใช้โดยตรง
+//
 // =====================================================
 
 function setupTiltPermission() {
 
-    const welcome =
-        $("welcomeScreen");
+    const button =
+        $("enableTilt");
 
-    if (!welcome) {
+    if (!button) {
+
+        console.warn(
+            "ไม่พบปุ่ม enableTilt"
+        );
+
         return;
-    }
-
-
-    // =================================================
-    // ถ้า Browser ไม่ต้องขอ Permission
-    // จะเริ่มเมื่อแตะหน้าแรกเช่นกัน
-    // =================================================
-
-    async function enableTilt() {
-
-        if (tiltStarted) {
-            return;
-        }
-
-        await startTiltBackground();
 
     }
 
 
-    // ใช้ pointerdown เพื่อให้ทำงานจาก
-    // การสัมผัสจริงของผู้ใช้
-    welcome.addEventListener(
-        "pointerdown",
-        enableTilt,
+    button.addEventListener(
+        "click",
+        async function (event) {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+
+            // ถ้าเปิดไปแล้ว
+            if (tiltStarted) {
+
+                button.textContent =
+                    "✓ เปิดการเอียงแล้ว";
+
+                button.disabled =
+                    true;
+
+                return;
+
+            }
+
+
+            // ป้องกันการกดซ้ำ
+            if (
+                tiltPermissionRequested
+            ) {
+
+                return;
+
+            }
+
+            tiltPermissionRequested =
+                true;
+
+
+            try {
+
+                // =================================================
+                // iPhone / iPad
+                // =================================================
+
+                if (
+                    typeof DeviceOrientationEvent !==
+                    "undefined" &&
+
+                    typeof DeviceOrientationEvent
+                        .requestPermission ===
+                    "function"
+                ) {
+
+                    button.textContent =
+                        "กำลังขอสิทธิ์ Motion...";
+
+
+                    // สำคัญ:
+                    // เรียกตรงจาก click event
+                    const permission =
+                        await DeviceOrientationEvent
+                            .requestPermission();
+
+
+                    if (
+                        permission !==
+                        "granted"
+                    ) {
+
+                        button.textContent =
+                            "⚠️ ต้องอนุญาต Motion";
+
+                        button.disabled =
+                            false;
+
+                        tiltPermissionRequested =
+                            false;
+
+                        alert(
+                            "กรุณาอนุญาตการเคลื่อนไหวและการวางแนวของอุปกรณ์ แล้วลองใหม่อีกครั้ง"
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+
+                // =================================================
+                // เริ่ม Sensor หลังได้รับสิทธิ์
+                // =================================================
+
+                const started =
+                    startTiltBackground();
+
+
+                if (!started) {
+
+                    button.textContent =
+                        "⚠️ เริ่ม Motion ไม่สำเร็จ";
+
+                    button.disabled =
+                        false;
+
+                    tiltPermissionRequested =
+                        false;
+
+                    return;
+
+                }
+
+
+                // =================================================
+                // สำเร็จ
+                // =================================================
+
+                button.textContent =
+                    "✓ เปิดการเอียงแล้ว";
+
+                button.disabled =
+                    true;
+
+                button.style.opacity =
+                    "0.65";
+
+                button.style.cursor =
+                    "default";
+
+
+            }
+            catch (error) {
+
+                console.error(
+                    "MOTION PERMISSION ERROR:",
+                    error
+                );
+
+
+                button.textContent =
+                    "⚠️ เปิดการเอียงไม่สำเร็จ";
+
+
+                button.disabled =
+                    false;
+
+
+                tiltPermissionRequested =
+                    false;
+
+
+                alert(
+                    "ไม่สามารถเปิด Motion ได้ กรุณาตรวจสอบสิทธิ์การเคลื่อนไหวของ Safari"
+                );
+
+            }
+
+        },
         {
-            passive: true
+            passive:
+                false
         }
     );
 
@@ -2805,7 +3112,9 @@ function escapeHtml(
     text
 ) {
 
-    return String(text)
+    return String(
+        text
+    )
         .replace(
             /&/g,
             "&amp;"
