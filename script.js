@@ -2847,7 +2847,6 @@ function closeStudentModal() {
 
 }
 
-
 // =====================================================
 // พื้นหลังขยับตามการเอียงมือถือ
 // =====================================================
@@ -2858,27 +2857,47 @@ async function startTiltBackground() {
         return;
     }
 
-    const welcome = $("welcomeScreen");
+    const welcome =
+        $("welcomeScreen");
 
-    if (!welcome) {
+    const background =
+        welcome?.querySelector(
+            ".welcome-background"
+        );
+
+    if (!welcome || !background) {
+        console.warn(
+            "ไม่พบ welcomeScreen หรือ welcome-background"
+        );
         return;
     }
 
+
+    // =================================================
     // ขอสิทธิ์ Motion สำหรับ iPhone / iPad
+    // =================================================
+
     if (
         typeof DeviceOrientationEvent !== "undefined" &&
         typeof DeviceOrientationEvent.requestPermission === "function"
     ) {
+
         try {
 
             const permission =
                 await DeviceOrientationEvent.requestPermission();
 
-            if (permission !== "granted") {
+            if (
+                permission !== "granted"
+            ) {
+                console.warn(
+                    "ไม่ได้รับสิทธิ์ Motion"
+                );
                 return;
             }
 
-        } catch (error) {
+        }
+        catch (error) {
 
             console.error(
                 "ไม่สามารถขอสิทธิ์ Motion ได้:",
@@ -2887,55 +2906,124 @@ async function startTiltBackground() {
 
             return;
         }
+
     }
+
 
     tiltStarted = true;
 
-    let targetPosition = 50;
-    let currentPosition = 50;
+
+    // =================================================
+    // ค่าการเคลื่อนไหว
+    // =================================================
+
+    let targetX = 0;
+    let currentX = 0;
+
+    let targetY = 0;
+    let currentY = 0;
+
     let animationRunning = false;
+
+
+    // =================================================
+    // Animation แบบ GPU
+    // =================================================
 
     function updateBackground() {
 
-        currentPosition +=
-            (targetPosition - currentPosition) * 0.12;
+        currentX +=
+            (targetX - currentX) * 0.12;
 
-        welcome.style.backgroundPosition =
-            `${currentPosition}% center`;
+        currentY +=
+            (targetY - currentY) * 0.12;
+
+
+        background.style.transform =
+            `translate3d(${currentX}px, ${currentY}px, 0)`;
+
 
         if (
-            Math.abs(targetPosition - currentPosition) > 0.05
+            Math.abs(targetX - currentX) > 0.05 ||
+            Math.abs(targetY - currentY) > 0.05
         ) {
-            requestAnimationFrame(updateBackground);
-        } else {
-            animationRunning = false;
+
+            requestAnimationFrame(
+                updateBackground
+            );
+
         }
+        else {
+
+            animationRunning = false;
+
+        }
+
     }
+
+
+    // =================================================
+    // ตรวจจับการเอียง
+    // =================================================
 
     window.addEventListener(
         "deviceorientation",
         function (event) {
 
-            let gamma = event.gamma || 0;
+            let gamma =
+                event.gamma || 0;
 
-            gamma = Math.max(
-                -30,
-                Math.min(30, gamma)
-            );
+            let beta =
+                event.beta || 0;
 
-            targetPosition =
-                50 + (gamma / 30) * 35;
 
+            // จำกัดการเอียง
+            gamma =
+                Math.max(
+                    -30,
+                    Math.min(
+                        30,
+                        gamma
+                    )
+                );
+
+
+            beta =
+                Math.max(
+                    -30,
+                    Math.min(
+                        30,
+                        beta - 45
+                    )
+                );
+
+
+            // แปลงการเอียงเป็นระยะขยับ
+            targetX =
+                (gamma / 30) * 30;
+
+            targetY =
+                (beta / 30) * 20;
+
+
+            // เริ่ม Animation
             if (!animationRunning) {
+
                 animationRunning = true;
-                requestAnimationFrame(updateBackground);
+
+                requestAnimationFrame(
+                    updateBackground
+                );
+
             }
 
         },
-        { passive: true }
+        {
+            passive: true
+        }
     );
-}
 
+}
 // =====================================================
 // ป้องกัน HTML Injection
 // =====================================================
