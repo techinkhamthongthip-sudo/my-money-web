@@ -1,6 +1,6 @@
 // =====================================================
 // ระบบบริหารเงินประจำห้อง ม.5/15
-// SCRIPT.JS — V3 AUTHENTICATION FIX
+// SCRIPT.JS — V3 AUTHENTICATION + SMOOTH TILT FIX
 // =====================================================
 
 const API_URL =
@@ -49,6 +49,13 @@ document.addEventListener(
         setupQR();
         setupSlipFile();
         setupOverview();
+
+        // =================================================
+        // เริ่มระบบเอียงเมื่อผู้ใช้แตะหน้าจอ
+        // สำคัญสำหรับ iPhone / iPad
+        // =================================================
+
+        setupTiltPermission();
 
     }
 );
@@ -110,7 +117,6 @@ function isAuthError(message) {
     const msg =
         String(message || "");
 
-
     return (
         msg.includes("ไม่ได้เข้าสู่ระบบ") ||
         msg.includes("Token ไม่ถูกต้อง") ||
@@ -132,21 +138,17 @@ function handleAuthError(message) {
         return false;
     }
 
-
     AUTH_TOKEN = "";
 
     sessionStorage.removeItem(
         "M515_AUTH_TOKEN"
     );
 
-
     alert(
         "เซสชันเข้าสู่ระบบหมดอายุ กรุณาเข้าสู่ระบบใหม่"
     );
 
-
     location.reload();
-
 
     return true;
 
@@ -185,16 +187,13 @@ function buildApiUrl(
             API_URL
         );
 
-
     url.searchParams.set(
         "action",
         action
     );
 
-
     const token =
         getAuthToken();
-
 
     if (token) {
 
@@ -205,13 +204,11 @@ function buildApiUrl(
 
     }
 
-
     Object.keys(params).forEach(
         function (key) {
 
             const value =
                 params[key];
-
 
             if (
                 value !== undefined &&
@@ -228,13 +225,10 @@ function buildApiUrl(
         }
     );
 
-
-    // ป้องกัน Cache
     url.searchParams.set(
         "_t",
         Date.now()
     );
-
 
     return url.toString();
 
@@ -253,17 +247,14 @@ function setupLogin() {
     const button =
         $("confirmCode");
 
-
     if (!input || !button) {
         return;
     }
-
 
     button.addEventListener(
         "click",
         checkAccessCode
     );
-
 
     input.addEventListener(
         "keydown",
@@ -293,15 +284,12 @@ async function checkAccessCode() {
     const message =
         $("codeMessage");
 
-
     if (!input) {
         return;
     }
 
-
     const code =
         input.value.trim();
-
 
     if (!/^\d{5}$/.test(code)) {
 
@@ -317,7 +305,6 @@ async function checkAccessCode() {
         return;
     }
 
-
     try {
 
         if (message) {
@@ -327,8 +314,6 @@ async function checkAccessCode() {
 
         }
 
-
-        // Login ไม่ต้องใช้ Token
         const url =
             buildApiUrl(
                 "login",
@@ -337,7 +322,6 @@ async function checkAccessCode() {
                 }
             );
 
-
         const response =
             await fetch(
                 url,
@@ -345,7 +329,6 @@ async function checkAccessCode() {
                     cache: "no-store"
                 }
             );
-
 
         if (!response.ok) {
 
@@ -356,10 +339,8 @@ async function checkAccessCode() {
 
         }
 
-
         const data =
             await response.json();
-
 
         if (!data.success) {
 
@@ -378,12 +359,6 @@ async function checkAccessCode() {
             return;
         }
 
-
-        // =================================================
-        // สำคัญมาก
-        // ตรวจสอบว่า Backend ส่ง Token กลับมาจริง
-        // =================================================
-
         if (!data.token) {
 
             throw new Error(
@@ -392,12 +367,10 @@ async function checkAccessCode() {
 
         }
 
-
         AUTH_TOKEN =
             String(
                 data.token
             ).trim();
-
 
         if (!AUTH_TOKEN) {
 
@@ -407,16 +380,10 @@ async function checkAccessCode() {
 
         }
 
-
         sessionStorage.setItem(
             "M515_AUTH_TOKEN",
             AUTH_TOKEN
         );
-
-
-        // =================================================
-        // เริ่มระบบตรวจจับการเอียงมือถือ
-        // =================================================
 
 
         // =================================================
@@ -433,9 +400,7 @@ async function checkAccessCode() {
 
         }
 
-
         input.disabled = true;
-
 
         const button =
             $("confirmCode");
@@ -451,7 +416,6 @@ async function checkAccessCode() {
 
         const logo =
             $("schoolLogo");
-
 
         if (logo) {
 
@@ -533,16 +497,13 @@ async function checkAccessCode() {
 
                 hideAllPages();
 
-
                 const home =
                     $("homePage");
-
 
                 if (home) {
 
                     home.style.display =
                         "block";
-
 
                     home.animate(
                         [
@@ -577,7 +538,6 @@ async function checkAccessCode() {
             error
         );
 
-
         if (message) {
 
             message.textContent =
@@ -597,10 +557,6 @@ async function checkAccessCode() {
 
 function setupButtons() {
 
-    // =================================================
-    // ตรวจสอบยอด
-    // =================================================
-
     const openCheck =
         $("openCheck");
 
@@ -613,10 +569,6 @@ function setupButtons() {
 
     }
 
-
-    // =================================================
-    // แจ้งชำระ
-    // =================================================
 
     const openPayment =
         $("openPayment");
@@ -631,10 +583,6 @@ function setupButtons() {
     }
 
 
-    // =================================================
-    // ดูยอดทุกคน
-    // =================================================
-
     const openOverview =
         $("openOverview");
 
@@ -647,10 +595,6 @@ function setupButtons() {
 
     }
 
-
-    // =================================================
-    // กลับหน้าแรก
-    // =================================================
 
     const backCheck =
         $("backFromCheck");
@@ -691,10 +635,6 @@ function setupButtons() {
     }
 
 
-    // =================================================
-    // เลือกนักเรียน
-    // =================================================
-
     const student =
         $("student");
 
@@ -714,10 +654,6 @@ function setupButtons() {
     }
 
 
-    // =================================================
-    // เดือน
-    // =================================================
-
     const month =
         $("month");
 
@@ -730,10 +666,6 @@ function setupButtons() {
 
     }
 
-
-    // =================================================
-    // นักเรียนหน้าแจ้งชำระ
-    // =================================================
 
     const paymentStudent =
         $("paymentStudent");
@@ -748,10 +680,6 @@ function setupButtons() {
     }
 
 
-    // =================================================
-    // ส่งข้อมูล
-    // =================================================
-
     const submit =
         $("submitPayment");
 
@@ -764,10 +692,6 @@ function setupButtons() {
 
     }
 
-
-    // =================================================
-    // ปิด Modal
-    // =================================================
 
     const closeModal =
         $("closeModal");
@@ -866,10 +790,6 @@ function showPaymentPage() {
 
 function showOverviewPage() {
 
-    // =================================================
-    // ตรวจ Token ก่อนเปิดหน้า
-    // =================================================
-
     if (!getAuthToken()) {
 
         alert(
@@ -879,7 +799,6 @@ function showOverviewPage() {
         return;
 
     }
-
 
     hideAllPages();
 
@@ -911,7 +830,6 @@ async function loadStudents() {
                 "students"
             );
 
-
         const response =
             await fetch(
                 url,
@@ -919,7 +837,6 @@ async function loadStudents() {
                     cache: "no-store"
                 }
             );
-
 
         if (!response.ok) {
 
@@ -930,10 +847,8 @@ async function loadStudents() {
 
         }
 
-
         const data =
             await response.json();
-
 
         if (!data.success) {
 
@@ -945,14 +860,12 @@ async function loadStudents() {
                 return;
             }
 
-
             throw new Error(
                 data.message ||
                 "โหลดรายชื่อไม่สำเร็จ"
             );
 
         }
-
 
         if (
             Array.isArray(
@@ -965,7 +878,6 @@ async function loadStudents() {
 
         }
 
-
         populateStudentSelects();
 
     }
@@ -975,7 +887,6 @@ async function loadStudents() {
             "LOAD STUDENTS ERROR:",
             error
         );
-
 
         if (
             !isAuthError(
@@ -1004,10 +915,8 @@ function populateStudentSelects() {
     const checkStudent =
         $("student");
 
-
     const paymentStudent =
         $("paymentStudent");
-
 
     if (checkStudent) {
 
@@ -1016,14 +925,12 @@ function populateStudentSelects() {
 
     }
 
-
     if (paymentStudent) {
 
         paymentStudent.innerHTML =
             '<option value="">-- เลือกเลขที่ --</option>';
 
     }
-
 
     students.forEach(
         function (student) {
@@ -1035,21 +942,17 @@ function populateStudentSelects() {
                         "option"
                     );
 
-
                 option.value =
                     student.number;
 
-
                 option.textContent =
                     student.number;
-
 
                 checkStudent.appendChild(
                     option
                 );
 
             }
-
 
             if (paymentStudent) {
 
@@ -1058,14 +961,11 @@ function populateStudentSelects() {
                         "option"
                     );
 
-
                 option.value =
                     student.number;
 
-
                 option.textContent =
                     student.number;
-
 
                 paymentStudent.appendChild(
                     option
@@ -1088,19 +988,15 @@ function updateCheckStudentName() {
     const number =
         $("student")?.value;
 
-
     const nameSelect =
         $("studentName");
-
 
     if (!nameSelect) {
         return;
     }
 
-
     nameSelect.innerHTML =
         '<option value="">-- เลือกชื่อ --</option>';
-
 
     const student =
         students.find(
@@ -1114,7 +1010,6 @@ function updateCheckStudentName() {
             }
         );
 
-
     if (student) {
 
         const option =
@@ -1122,18 +1017,14 @@ function updateCheckStudentName() {
                 "option"
             );
 
-
         option.value =
             student.name;
-
 
         option.textContent =
             student.name;
 
-
         option.selected =
             true;
-
 
         nameSelect.appendChild(
             option
@@ -1149,19 +1040,15 @@ function updatePaymentStudentName() {
     const number =
         $("paymentStudent")?.value;
 
-
     const nameSelect =
         $("paymentStudentName");
-
 
     if (!nameSelect) {
         return;
     }
 
-
     nameSelect.innerHTML =
         '<option value="">-- เลือกชื่อ --</option>';
-
 
     const student =
         students.find(
@@ -1175,7 +1062,6 @@ function updatePaymentStudentName() {
             }
         );
 
-
     if (student) {
 
         const option =
@@ -1183,18 +1069,14 @@ function updatePaymentStudentName() {
                 "option"
             );
 
-
         option.value =
             student.name;
-
 
         option.textContent =
             student.name;
 
-
         option.selected =
             true;
-
 
         nameSelect.appendChild(
             option
@@ -1214,26 +1096,20 @@ async function checkPayment() {
     const number =
         $("student")?.value;
 
-
     const month =
         $("month")?.value;
-
 
     const status =
         $("status");
 
-
     const requiredEl =
         $("required");
-
 
     const paidEl =
         $("paid");
 
-
     const remainingEl =
         $("remaining");
-
 
     if (
         !number ||
@@ -1263,7 +1139,6 @@ async function checkPayment() {
         return;
     }
 
-
     if (!getAuthToken()) {
 
         if (status) {
@@ -1276,7 +1151,6 @@ async function checkPayment() {
         return;
 
     }
-
 
     try {
 
@@ -1292,7 +1166,6 @@ async function checkPayment() {
                 }
             );
 
-
         const response =
             await fetch(
                 url,
@@ -1300,7 +1173,6 @@ async function checkPayment() {
                     cache: "no-store"
                 }
             );
-
 
         if (!response.ok) {
 
@@ -1311,10 +1183,8 @@ async function checkPayment() {
 
         }
 
-
         const data =
             await response.json();
-
 
         if (!data.success) {
 
@@ -1325,7 +1195,6 @@ async function checkPayment() {
             ) {
                 return;
             }
-
 
             if (status) {
 
@@ -1338,25 +1207,21 @@ async function checkPayment() {
             return;
         }
 
-
         const required =
             Number(
                 data.required
             ) || 0;
-
 
         const paid =
             Number(
                 data.paid
             ) || 0;
 
-
         const remaining =
             Math.max(
                 required - paid,
                 0
             );
-
 
         if (requiredEl) {
 
@@ -1368,7 +1233,6 @@ async function checkPayment() {
 
         }
 
-
         if (paidEl) {
 
             paidEl.textContent =
@@ -1379,7 +1243,6 @@ async function checkPayment() {
 
         }
 
-
         if (remainingEl) {
 
             remainingEl.textContent =
@@ -1389,7 +1252,6 @@ async function checkPayment() {
                 " บาท";
 
         }
-
 
         if (status) {
 
@@ -1423,7 +1285,6 @@ async function checkPayment() {
             error
         );
 
-
         if (
             handleAuthError(
                 error.message
@@ -1431,7 +1292,6 @@ async function checkPayment() {
         ) {
             return;
         }
-
 
         if (status) {
 
@@ -1473,7 +1333,6 @@ function crc16(data) {
     let crc =
         0xFFFF;
 
-
     for (
         let i = 0;
         i < data.length;
@@ -1482,7 +1341,6 @@ function crc16(data) {
 
         crc ^=
             data.charCodeAt(i) << 8;
-
 
         for (
             let j = 0;
@@ -1506,14 +1364,12 @@ function crc16(data) {
 
             }
 
-
             crc &=
                 0xFFFF;
 
         }
 
     }
-
 
     return crc
         .toString(16)
@@ -1538,7 +1394,6 @@ function createPromptPayPayload(
                 ""
             );
 
-
     if (
         phone.startsWith("0")
     ) {
@@ -1548,7 +1403,6 @@ function createPromptPayPayload(
             phone.substring(1);
 
     }
-
 
     const merchantAccountInfo =
         emvTag(
@@ -1560,10 +1414,8 @@ function createPromptPayPayload(
             phone
         );
 
-
     let payload =
         "";
-
 
     payload +=
         emvTag(
@@ -1571,13 +1423,11 @@ function createPromptPayPayload(
             "01"
         );
 
-
     payload +=
         emvTag(
             "01",
             "12"
         );
-
 
     payload +=
         emvTag(
@@ -1585,20 +1435,17 @@ function createPromptPayPayload(
             merchantAccountInfo
         );
 
-
     payload +=
         emvTag(
             "52",
             "0000"
         );
 
-
     payload +=
         emvTag(
             "53",
             "764"
         );
-
 
     if (
         Number(amount) > 0
@@ -1613,13 +1460,11 @@ function createPromptPayPayload(
 
     }
 
-
     payload +=
         emvTag(
             "58",
             "TH"
         );
-
 
     payload +=
         emvTag(
@@ -1627,18 +1472,15 @@ function createPromptPayPayload(
             "SSW ROOM M515"
         );
 
-
     payload +=
         emvTag(
             "60",
             "LOEI"
         );
 
-
     const crcInput =
         payload +
         "6304";
-
 
     return (
         crcInput +
@@ -1657,14 +1499,11 @@ function generatePaymentQR() {
     const amountInput =
         $("amount");
 
-
     const qrContainer =
         $("qrcode");
 
-
     const qrAmount =
         $("qrAmount");
-
 
     if (
         !amountInput ||
@@ -1673,16 +1512,13 @@ function generatePaymentQR() {
         return;
     }
 
-
     const amount =
         Number(
             amountInput.value
         );
 
-
     qrContainer.innerHTML =
         "";
-
 
     if (
         !amount ||
@@ -1699,7 +1535,6 @@ function generatePaymentQR() {
         return;
     }
 
-
     if (
         typeof QRCode ===
         "undefined"
@@ -1711,13 +1546,11 @@ function generatePaymentQR() {
         return;
     }
 
-
     const payload =
         createPromptPayPayload(
             PROMPTPAY_NUMBER,
             amount
         );
-
 
     new QRCode(
         qrContainer,
@@ -1735,7 +1568,6 @@ function generatePaymentQR() {
                 QRCode.CorrectLevel.M
         }
     );
-
 
     if (qrAmount) {
 
@@ -1762,11 +1594,9 @@ function setupQR() {
     const amount =
         $("amount");
 
-
     if (!amount) {
         return;
     }
-
 
     amount.addEventListener(
         "input",
@@ -1785,10 +1615,8 @@ function setupSlipFile() {
     const fileInput =
         $("slipFile");
 
-
     const fileName =
         $("fileName");
-
 
     if (
         !fileInput ||
@@ -1796,7 +1624,6 @@ function setupSlipFile() {
     ) {
         return;
     }
-
 
     fileInput.addEventListener(
         "change",
@@ -1839,13 +1666,11 @@ function compressImage(file) {
             const reader =
                 new FileReader();
 
-
             reader.onload =
                 function (event) {
 
                     const image =
                         new Image();
-
 
                     image.onload =
                         function () {
@@ -1853,14 +1678,11 @@ function compressImage(file) {
                             const maxWidth =
                                 1200;
 
-
                             let width =
                                 image.width;
 
-
                             let height =
                                 image.height;
-
 
                             if (
                                 width >
@@ -1879,26 +1701,21 @@ function compressImage(file) {
 
                             }
 
-
                             const canvas =
                                 document.createElement(
                                     "canvas"
                                 );
 
-
                             canvas.width =
                                 width;
 
-
                             canvas.height =
                                 height;
-
 
                             const ctx =
                                 canvas.getContext(
                                     "2d"
                                 );
-
 
                             ctx.drawImage(
                                 image,
@@ -1908,7 +1725,6 @@ function compressImage(file) {
                                 height
                             );
 
-
                             resolve(
                                 canvas.toDataURL(
                                     "image/jpeg",
@@ -1917,7 +1733,6 @@ function compressImage(file) {
                             );
 
                         };
-
 
                     image.onerror =
                         function () {
@@ -1930,12 +1745,10 @@ function compressImage(file) {
 
                         };
 
-
                     image.src =
                         event.target.result;
 
                 };
-
 
             reader.onerror =
                 function () {
@@ -1947,7 +1760,6 @@ function compressImage(file) {
                     );
 
                 };
-
 
             reader.readAsDataURL(
                 file
@@ -1968,26 +1780,20 @@ async function submitPaymentData() {
     const number =
         $("paymentStudent")?.value;
 
-
     const month =
         $("paymentMonth")?.value;
-
 
     const amount =
         $("amount")?.value;
 
-
     const date =
         $("date")?.value;
-
 
     const fileInput =
         $("slipFile");
 
-
     const status =
         $("submitStatus");
-
 
     if (!number) {
 
@@ -1998,7 +1804,6 @@ async function submitPaymentData() {
         return;
     }
 
-
     if (!month) {
 
         alert(
@@ -2007,7 +1812,6 @@ async function submitPaymentData() {
 
         return;
     }
-
 
     if (
         !amount ||
@@ -2021,7 +1825,6 @@ async function submitPaymentData() {
         return;
     }
 
-
     if (!date) {
 
         alert(
@@ -2030,7 +1833,6 @@ async function submitPaymentData() {
 
         return;
     }
-
 
     if (
         !fileInput ||
@@ -2044,7 +1846,6 @@ async function submitPaymentData() {
         return;
     }
 
-
     if (!getAuthToken()) {
 
         alert(
@@ -2056,7 +1857,6 @@ async function submitPaymentData() {
         return;
     }
 
-
     try {
 
         if (status) {
@@ -2066,12 +1866,10 @@ async function submitPaymentData() {
 
         }
 
-
         const image =
             await compressImage(
                 fileInput.files[0]
             );
-
 
         const payload = {
 
@@ -2098,7 +1896,6 @@ async function submitPaymentData() {
 
         };
 
-
         const response =
             await fetch(
                 API_URL +
@@ -2118,7 +1915,6 @@ async function submitPaymentData() {
                 }
             );
 
-
         if (!response.ok) {
 
             throw new Error(
@@ -2128,10 +1924,8 @@ async function submitPaymentData() {
 
         }
 
-
         const data =
             await response.json();
-
 
         if (!data.success) {
 
@@ -2143,7 +1937,6 @@ async function submitPaymentData() {
                 return;
             }
 
-
             if (status) {
 
                 status.textContent =
@@ -2151,7 +1944,6 @@ async function submitPaymentData() {
                     "เกิดข้อผิดพลาด";
 
             }
-
 
             alert(
                 data.message ||
@@ -2161,7 +1953,6 @@ async function submitPaymentData() {
             return;
         }
 
-
         if (status) {
 
             status.textContent =
@@ -2170,16 +1961,11 @@ async function submitPaymentData() {
 
         }
 
-
         alert(
             data.message ||
             "แจ้งชำระเงินสำเร็จ ✓"
         );
 
-
-        // =================================================
-        // ล้างฟอร์ม
-        // =================================================
 
         const paymentStudent =
             $("paymentStudent");
@@ -2191,7 +1977,6 @@ async function submitPaymentData() {
 
         }
 
-
         const paymentStudentName =
             $("paymentStudentName");
 
@@ -2201,7 +1986,6 @@ async function submitPaymentData() {
                 '<option value="">-- เลือกชื่อ --</option>';
 
         }
-
 
         const paymentMonth =
             $("paymentMonth");
@@ -2213,7 +1997,6 @@ async function submitPaymentData() {
 
         }
 
-
         const amountEl =
             $("amount");
 
@@ -2223,7 +2006,6 @@ async function submitPaymentData() {
                 "";
 
         }
-
 
         const dateEl =
             $("date");
@@ -2235,10 +2017,8 @@ async function submitPaymentData() {
 
         }
 
-
         fileInput.value =
             "";
-
 
         const fileName =
             $("fileName");
@@ -2250,7 +2030,6 @@ async function submitPaymentData() {
 
         }
 
-
         const qr =
             $("qrcode");
 
@@ -2260,7 +2039,6 @@ async function submitPaymentData() {
                 "";
 
         }
-
 
         const qrAmount =
             $("qrAmount");
@@ -2280,7 +2058,6 @@ async function submitPaymentData() {
             error
         );
 
-
         if (
             handleAuthError(
                 error.message
@@ -2289,14 +2066,12 @@ async function submitPaymentData() {
             return;
         }
 
-
         if (status) {
 
             status.textContent =
                 "เกิดข้อผิดพลาดในการเชื่อมต่อ";
 
         }
-
 
         alert(
             "ไม่สามารถเชื่อมต่อ Google Apps Script ได้"
@@ -2316,11 +2091,9 @@ function setupOverview() {
     const month =
         $("overviewMonth");
 
-
     if (!month) {
         return;
     }
-
 
     month.addEventListener(
         "change",
@@ -2339,14 +2112,11 @@ async function loadOverview() {
     const month =
         $("overviewMonth")?.value;
 
-
     const grid =
         $("studentGrid");
 
-
     const status =
         $("overviewStatus");
-
 
     if (
         !grid ||
@@ -2355,14 +2125,8 @@ async function loadOverview() {
         return;
     }
 
-
-    // =================================================
-    // ตรวจ Token ก่อนเรียก API
-    // =================================================
-
     const token =
         getAuthToken();
-
 
     if (!token) {
 
@@ -2373,11 +2137,9 @@ async function loadOverview() {
 
         }
 
-
         alert(
             "ไม่พบ Session การเข้าสู่ระบบ กรุณาเข้าสู่ระบบใหม่"
         );
-
 
         logout();
 
@@ -2385,10 +2147,8 @@ async function loadOverview() {
 
     }
 
-
     grid.innerHTML =
         "";
-
 
     if (status) {
 
@@ -2396,7 +2156,6 @@ async function loadOverview() {
             "กำลังโหลดข้อมูล...";
 
     }
-
 
     try {
 
@@ -2409,18 +2168,15 @@ async function loadOverview() {
                 }
             );
 
-
         console.log(
             "OVERVIEW URL:",
             url
         );
 
-
         console.log(
             "AUTH TOKEN EXISTS:",
             !!getAuthToken()
         );
-
 
         const response =
             await fetch(
@@ -2431,7 +2187,6 @@ async function loadOverview() {
                 }
             );
 
-
         if (!response.ok) {
 
             throw new Error(
@@ -2441,16 +2196,13 @@ async function loadOverview() {
 
         }
 
-
         const data =
             await response.json();
-
 
         console.log(
             "OVERVIEW RESPONSE:",
             data
         );
-
 
         if (!data.success) {
 
@@ -2462,7 +2214,6 @@ async function loadOverview() {
                 return;
             }
 
-
             throw new Error(
                 data.message ||
                 "โหลดข้อมูลไม่สำเร็จ"
@@ -2470,11 +2221,9 @@ async function loadOverview() {
 
         }
 
-
         renderStudentCards(
             data.students || []
         );
-
 
         if (status) {
 
@@ -2498,7 +2247,6 @@ async function loadOverview() {
             error
         );
 
-
         if (
             handleAuthError(
                 error.message
@@ -2506,7 +2254,6 @@ async function loadOverview() {
         ) {
             return;
         }
-
 
         if (status) {
 
@@ -2532,15 +2279,12 @@ function renderStudentCards(
     const grid =
         $("studentGrid");
 
-
     if (!grid) {
         return;
     }
 
-
     grid.innerHTML =
         "";
-
 
     if (
         !Array.isArray(data) ||
@@ -2557,7 +2301,6 @@ function renderStudentCards(
 
     }
 
-
     data.forEach(
         function (student) {
 
@@ -2567,22 +2310,18 @@ function renderStudentCards(
             const card =
                 document.createElement("button");
 
-
             card.className =
                 "student-card";
-
 
             const paid =
                 Number(
                     student.paid
                 ) || 0;
 
-
             const required =
                 Number(
                     student.required
                 ) || 0;
-
 
             const remaining =
                 Math.max(
@@ -2591,20 +2330,17 @@ function renderStudentCards(
                     0
                 );
 
-
             const complete =
                 remaining <= 0 &&
                 required > 0;
 
-
-            // =================================================
-            // สร้าง Card
-            // =================================================
-
             card.innerHTML = `
 
                 <div class="student-avatar">
-                    <img src="${photo}" alt="${escapeHtml(student.name)}">
+                    <img
+                        src="${photo}"
+                        alt="${escapeHtml(student.name)}"
+                    >
                 </div>
 
                 <div class="student-number">
@@ -2639,7 +2375,6 @@ function renderStudentCards(
 
             `;
 
-
             card.addEventListener(
                 "click",
                 function () {
@@ -2650,7 +2385,6 @@ function renderStudentCards(
 
                 }
             );
-
 
             grid.appendChild(
                 card
@@ -2674,7 +2408,6 @@ function showStudentDetail(student) {
     const detailPhoto =
         $("detailPhoto");
 
-
     if (detailPhoto) {
 
         detailPhoto.src =
@@ -2686,18 +2419,15 @@ function showStudentDetail(student) {
 
     }
 
-
     const required =
         Number(
             student.required
         ) || 0;
 
-
     const paid =
         Number(
             student.paid
         ) || 0;
-
 
     const remaining =
         Math.max(
@@ -2706,30 +2436,23 @@ function showStudentDetail(student) {
             0
         );
 
-
     const detailNumber =
         $("detailNumber");
-
 
     const detailName =
         $("detailName");
 
-
     const detailRequired =
         $("detailRequired");
-
 
     const detailPaid =
         $("detailPaid");
 
-
     const detailRemaining =
         $("detailRemaining");
 
-
     const detailStatus =
         $("detailStatus");
-
 
     if (detailNumber) {
 
@@ -2739,14 +2462,12 @@ function showStudentDetail(student) {
 
     }
 
-
     if (detailName) {
 
         detailName.textContent =
             student.name;
 
     }
-
 
     if (detailRequired) {
 
@@ -2758,7 +2479,6 @@ function showStudentDetail(student) {
 
     }
 
-
     if (detailPaid) {
 
         detailPaid.textContent =
@@ -2769,7 +2489,6 @@ function showStudentDetail(student) {
 
     }
 
-
     if (detailRemaining) {
 
         detailRemaining.textContent =
@@ -2779,7 +2498,6 @@ function showStudentDetail(student) {
             " บาท";
 
     }
-
 
     if (detailStatus) {
 
@@ -2817,7 +2535,6 @@ function showStudentDetail(student) {
 
     }
 
-
     if (modal) {
 
         modal.style.display =
@@ -2837,7 +2554,6 @@ function closeStudentModal() {
     const modal =
         $("studentModal");
 
-
     if (modal) {
 
         modal.style.display =
@@ -2847,6 +2563,7 @@ function closeStudentModal() {
 
 }
 
+
 // =====================================================
 // พื้นหลังขยับตามการเอียงมือถือ
 // =====================================================
@@ -2854,7 +2571,7 @@ function closeStudentModal() {
 async function startTiltBackground() {
 
     if (tiltStarted) {
-        return;
+        return true;
     }
 
     const welcome =
@@ -2866,10 +2583,12 @@ async function startTiltBackground() {
         );
 
     if (!welcome || !background) {
+
         console.warn(
             "ไม่พบ welcomeScreen หรือ welcome-background"
         );
-        return;
+
+        return false;
     }
 
 
@@ -2890,10 +2609,13 @@ async function startTiltBackground() {
             if (
                 permission !== "granted"
             ) {
+
                 console.warn(
                     "ไม่ได้รับสิทธิ์ Motion"
                 );
-                return;
+
+                return false;
+
             }
 
         }
@@ -2904,7 +2626,8 @@ async function startTiltBackground() {
                 error
             );
 
-            return;
+            return false;
+
         }
 
     }
@@ -2977,7 +2700,6 @@ async function startTiltBackground() {
                 event.beta || 0;
 
 
-            // จำกัดการเอียง
             gamma =
                 Math.max(
                     -30,
@@ -2998,7 +2720,6 @@ async function startTiltBackground() {
                 );
 
 
-            // แปลงการเอียงเป็นระยะขยับ
             targetX =
                 (gamma / 30) * 30;
 
@@ -3006,7 +2727,6 @@ async function startTiltBackground() {
                 (beta / 30) * 20;
 
 
-            // เริ่ม Animation
             if (!animationRunning) {
 
                 animationRunning = true;
@@ -3023,7 +2743,60 @@ async function startTiltBackground() {
         }
     );
 
+
+    console.log(
+        "Motion Sensor เริ่มทำงานแล้ว"
+    );
+
+    return true;
+
 }
+
+
+// =====================================================
+// ขอสิทธิ์ Motion จากการแตะหน้าจอ
+// สำคัญสำหรับ iPhone / iPad
+// =====================================================
+
+function setupTiltPermission() {
+
+    const welcome =
+        $("welcomeScreen");
+
+    if (!welcome) {
+        return;
+    }
+
+
+    // =================================================
+    // ถ้า Browser ไม่ต้องขอ Permission
+    // จะเริ่มเมื่อแตะหน้าแรกเช่นกัน
+    // =================================================
+
+    async function enableTilt() {
+
+        if (tiltStarted) {
+            return;
+        }
+
+        await startTiltBackground();
+
+    }
+
+
+    // ใช้ pointerdown เพื่อให้ทำงานจาก
+    // การสัมผัสจริงของผู้ใช้
+    welcome.addEventListener(
+        "pointerdown",
+        enableTilt,
+        {
+            passive: true
+        }
+    );
+
+}
+
+
 // =====================================================
 // ป้องกัน HTML Injection
 // =====================================================
@@ -3055,7 +2828,3 @@ function escapeHtml(
         );
 
 }
-
-document.addEventListener("DOMContentLoaded", function () {
-    startTiltBackground();
-});
