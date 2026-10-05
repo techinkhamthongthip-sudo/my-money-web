@@ -1,7 +1,6 @@
 // =====================================================
 // ระบบบริหารเงินประจำห้อง ม.5/15
-// SCRIPT.JS — V3 AUTHENTICATION + SMOOTH TILT FIX
-// iPhone Motion Permission FIX
+// SCRIPT.JS — V3 AUTHENTICATION FIX
 // =====================================================
 
 const API_URL =
@@ -18,10 +17,7 @@ let AUTH_TOKEN =
     sessionStorage.getItem("M515_AUTH_TOKEN") || "";
 
 let students = [];
-
 let tiltStarted = false;
-
-let tiltPermissionRequested = false;
 
 
 // =====================================================
@@ -42,31 +38,17 @@ document.addEventListener(
 
         hideAllPages();
 
-        const welcome =
-            $("welcomeScreen");
+        const welcome = $("welcomeScreen");
 
         if (welcome) {
-
-            welcome.style.display =
-                "flex";
-
+            welcome.style.display = "flex";
         }
 
         setupLogin();
-
         setupButtons();
-
         setupQR();
-
         setupSlipFile();
-
         setupOverview();
-
-        // =================================================
-        // ตั้งค่าปุ่ม Motion สำหรับ iPhone / iPad
-        // =================================================
-
-        setupTiltPermission();
 
     }
 );
@@ -89,14 +71,10 @@ function hideAllPages() {
     pages.forEach(
         function (id) {
 
-            const el =
-                $(id);
+            const el = $(id);
 
             if (el) {
-
-                el.style.display =
-                    "none";
-
+                el.style.display = "none";
             }
 
         }
@@ -112,10 +90,7 @@ function hideAllPages() {
 function getAuthToken() {
 
     return (
-        String(
-            AUTH_TOKEN || ""
-        ).trim() ||
-
+        String(AUTH_TOKEN || "").trim() ||
         String(
             sessionStorage.getItem(
                 "M515_AUTH_TOKEN"
@@ -133,9 +108,8 @@ function getAuthToken() {
 function isAuthError(message) {
 
     const msg =
-        String(
-            message || ""
-        );
+        String(message || "");
+
 
     return (
         msg.includes("ไม่ได้เข้าสู่ระบบ") ||
@@ -155,10 +129,9 @@ function isAuthError(message) {
 function handleAuthError(message) {
 
     if (!isAuthError(message)) {
-
         return false;
-
     }
+
 
     AUTH_TOKEN = "";
 
@@ -166,11 +139,14 @@ function handleAuthError(message) {
         "M515_AUTH_TOKEN"
     );
 
+
     alert(
         "เซสชันเข้าสู่ระบบหมดอายุ กรุณาเข้าสู่ระบบใหม่"
     );
 
+
     location.reload();
+
 
     return true;
 
@@ -209,13 +185,16 @@ function buildApiUrl(
             API_URL
         );
 
+
     url.searchParams.set(
         "action",
         action
     );
 
+
     const token =
         getAuthToken();
+
 
     if (token) {
 
@@ -226,11 +205,13 @@ function buildApiUrl(
 
     }
 
+
     Object.keys(params).forEach(
         function (key) {
 
             const value =
                 params[key];
+
 
             if (
                 value !== undefined &&
@@ -247,10 +228,13 @@ function buildApiUrl(
         }
     );
 
+
+    // ป้องกัน Cache
     url.searchParams.set(
         "_t",
         Date.now()
     );
+
 
     return url.toString();
 
@@ -269,24 +253,23 @@ function setupLogin() {
     const button =
         $("confirmCode");
 
+
     if (!input || !button) {
-
         return;
-
     }
+
 
     button.addEventListener(
         "click",
         checkAccessCode
     );
 
+
     input.addEventListener(
         "keydown",
         function (event) {
 
-            if (
-                event.key === "Enter"
-            ) {
+            if (event.key === "Enter") {
 
                 checkAccessCode();
 
@@ -310,14 +293,15 @@ async function checkAccessCode() {
     const message =
         $("codeMessage");
 
+
     if (!input) {
-
         return;
-
     }
+
 
     const code =
         input.value.trim();
+
 
     if (!/^\d{5}$/.test(code)) {
 
@@ -331,8 +315,8 @@ async function checkAccessCode() {
         input.focus();
 
         return;
-
     }
+
 
     try {
 
@@ -343,23 +327,25 @@ async function checkAccessCode() {
 
         }
 
+
+        // Login ไม่ต้องใช้ Token
         const url =
             buildApiUrl(
                 "login",
                 {
-                    code:
-                        code
+                    code: code
                 }
             );
+
 
         const response =
             await fetch(
                 url,
                 {
-                    cache:
-                        "no-store"
+                    cache: "no-store"
                 }
             );
+
 
         if (!response.ok) {
 
@@ -370,8 +356,10 @@ async function checkAccessCode() {
 
         }
 
+
         const data =
             await response.json();
+
 
         if (!data.success) {
 
@@ -383,14 +371,18 @@ async function checkAccessCode() {
 
             }
 
-            input.value =
-                "";
+            input.value = "";
 
             input.focus();
 
             return;
-
         }
+
+
+        // =================================================
+        // สำคัญมาก
+        // ตรวจสอบว่า Backend ส่ง Token กลับมาจริง
+        // =================================================
 
         if (!data.token) {
 
@@ -400,10 +392,12 @@ async function checkAccessCode() {
 
         }
 
+
         AUTH_TOKEN =
             String(
                 data.token
             ).trim();
+
 
         if (!AUTH_TOKEN) {
 
@@ -413,10 +407,16 @@ async function checkAccessCode() {
 
         }
 
+
         sessionStorage.setItem(
             "M515_AUTH_TOKEN",
             AUTH_TOKEN
         );
+
+
+        // =================================================
+        // เริ่มระบบตรวจจับการเอียงมือถือ
+        // =================================================
 
 
         // =================================================
@@ -433,17 +433,15 @@ async function checkAccessCode() {
 
         }
 
-        input.disabled =
-            true;
+
+        input.disabled = true;
+
 
         const button =
             $("confirmCode");
 
         if (button) {
-
-            button.disabled =
-                true;
-
+            button.disabled = true;
         }
 
 
@@ -453,6 +451,7 @@ async function checkAccessCode() {
 
         const logo =
             $("schoolLogo");
+
 
         if (logo) {
 
@@ -480,14 +479,10 @@ async function checkAccessCode() {
                     }
                 ],
                 {
-                    duration:
-                        1800,
-
+                    duration: 1800,
                     easing:
                         "cubic-bezier(.2,.8,.2,1)",
-
-                    fill:
-                        "forwards"
+                    fill: "forwards"
                 }
             );
 
@@ -509,29 +504,20 @@ async function checkAccessCode() {
                     welcome.animate(
                         [
                             {
-                                opacity:
-                                    1,
-
+                                opacity: 1,
                                 transform:
                                     "scale(1)"
                             },
                             {
-                                opacity:
-                                    0,
-
+                                opacity: 0,
                                 transform:
                                     "scale(1.04)"
                             }
                         ],
                         {
-                            duration:
-                                600,
-
-                            easing:
-                                "ease-in",
-
-                            fill:
-                                "forwards"
+                            duration: 600,
+                            easing: "ease-in",
+                            fill: "forwards"
                         }
                     );
 
@@ -547,37 +533,33 @@ async function checkAccessCode() {
 
                 hideAllPages();
 
+
                 const home =
                     $("homePage");
+
 
                 if (home) {
 
                     home.style.display =
                         "block";
 
+
                     home.animate(
                         [
                             {
-                                opacity:
-                                    0,
-
+                                opacity: 0,
                                 transform:
                                     "translateY(20px)"
                             },
                             {
-                                opacity:
-                                    1,
-
+                                opacity: 1,
                                 transform:
                                     "translateY(0)"
                             }
                         ],
                         {
-                            duration:
-                                500,
-
-                            easing:
-                                "ease-out"
+                            duration: 500,
+                            easing: "ease-out"
                         }
                     );
 
@@ -594,6 +576,7 @@ async function checkAccessCode() {
             "LOGIN ERROR:",
             error
         );
+
 
         if (message) {
 
@@ -614,6 +597,10 @@ async function checkAccessCode() {
 
 function setupButtons() {
 
+    // =================================================
+    // ตรวจสอบยอด
+    // =================================================
+
     const openCheck =
         $("openCheck");
 
@@ -626,6 +613,10 @@ function setupButtons() {
 
     }
 
+
+    // =================================================
+    // แจ้งชำระ
+    // =================================================
 
     const openPayment =
         $("openPayment");
@@ -640,6 +631,10 @@ function setupButtons() {
     }
 
 
+    // =================================================
+    // ดูยอดทุกคน
+    // =================================================
+
     const openOverview =
         $("openOverview");
 
@@ -652,6 +647,10 @@ function setupButtons() {
 
     }
 
+
+    // =================================================
+    // กลับหน้าแรก
+    // =================================================
 
     const backCheck =
         $("backFromCheck");
@@ -692,6 +691,10 @@ function setupButtons() {
     }
 
 
+    // =================================================
+    // เลือกนักเรียน
+    // =================================================
+
     const student =
         $("student");
 
@@ -711,6 +714,10 @@ function setupButtons() {
     }
 
 
+    // =================================================
+    // เดือน
+    // =================================================
+
     const month =
         $("month");
 
@@ -723,6 +730,10 @@ function setupButtons() {
 
     }
 
+
+    // =================================================
+    // นักเรียนหน้าแจ้งชำระ
+    // =================================================
 
     const paymentStudent =
         $("paymentStudent");
@@ -737,6 +748,10 @@ function setupButtons() {
     }
 
 
+    // =================================================
+    // ส่งข้อมูล
+    // =================================================
+
     const submit =
         $("submitPayment");
 
@@ -749,6 +764,10 @@ function setupButtons() {
 
     }
 
+
+    // =================================================
+    // ปิด Modal
+    // =================================================
 
     const closeModal =
         $("closeModal");
@@ -773,8 +792,7 @@ function setupButtons() {
             function (event) {
 
                 if (
-                    event.target ===
-                    modal
+                    event.target === modal
                 ) {
 
                     closeStudentModal();
@@ -848,6 +866,10 @@ function showPaymentPage() {
 
 function showOverviewPage() {
 
+    // =================================================
+    // ตรวจ Token ก่อนเปิดหน้า
+    // =================================================
+
     if (!getAuthToken()) {
 
         alert(
@@ -857,6 +879,7 @@ function showOverviewPage() {
         return;
 
     }
+
 
     hideAllPages();
 
@@ -888,14 +911,15 @@ async function loadStudents() {
                 "students"
             );
 
+
         const response =
             await fetch(
                 url,
                 {
-                    cache:
-                        "no-store"
+                    cache: "no-store"
                 }
             );
+
 
         if (!response.ok) {
 
@@ -906,8 +930,10 @@ async function loadStudents() {
 
         }
 
+
         const data =
             await response.json();
+
 
         if (!data.success) {
 
@@ -916,10 +942,9 @@ async function loadStudents() {
                     data.message
                 )
             ) {
-
                 return;
-
             }
+
 
             throw new Error(
                 data.message ||
@@ -927,6 +952,7 @@ async function loadStudents() {
             );
 
         }
+
 
         if (
             Array.isArray(
@@ -939,6 +965,7 @@ async function loadStudents() {
 
         }
 
+
         populateStudentSelects();
 
     }
@@ -948,6 +975,7 @@ async function loadStudents() {
             "LOAD STUDENTS ERROR:",
             error
         );
+
 
         if (
             !isAuthError(
@@ -976,8 +1004,10 @@ function populateStudentSelects() {
     const checkStudent =
         $("student");
 
+
     const paymentStudent =
         $("paymentStudent");
+
 
     if (checkStudent) {
 
@@ -986,12 +1016,14 @@ function populateStudentSelects() {
 
     }
 
+
     if (paymentStudent) {
 
         paymentStudent.innerHTML =
             '<option value="">-- เลือกเลขที่ --</option>';
 
     }
+
 
     students.forEach(
         function (student) {
@@ -1003,17 +1035,21 @@ function populateStudentSelects() {
                         "option"
                     );
 
+
                 option.value =
                     student.number;
 
+
                 option.textContent =
                     student.number;
+
 
                 checkStudent.appendChild(
                     option
                 );
 
             }
+
 
             if (paymentStudent) {
 
@@ -1022,11 +1058,14 @@ function populateStudentSelects() {
                         "option"
                     );
 
+
                 option.value =
                     student.number;
 
+
                 option.textContent =
                     student.number;
+
 
                 paymentStudent.appendChild(
                     option
@@ -1049,17 +1088,19 @@ function updateCheckStudentName() {
     const number =
         $("student")?.value;
 
+
     const nameSelect =
         $("studentName");
 
+
     if (!nameSelect) {
-
         return;
-
     }
+
 
     nameSelect.innerHTML =
         '<option value="">-- เลือกชื่อ --</option>';
+
 
     const student =
         students.find(
@@ -1073,6 +1114,7 @@ function updateCheckStudentName() {
             }
         );
 
+
     if (student) {
 
         const option =
@@ -1080,14 +1122,18 @@ function updateCheckStudentName() {
                 "option"
             );
 
+
         option.value =
             student.name;
+
 
         option.textContent =
             student.name;
 
+
         option.selected =
             true;
+
 
         nameSelect.appendChild(
             option
@@ -1103,17 +1149,19 @@ function updatePaymentStudentName() {
     const number =
         $("paymentStudent")?.value;
 
+
     const nameSelect =
         $("paymentStudentName");
 
+
     if (!nameSelect) {
-
         return;
-
     }
+
 
     nameSelect.innerHTML =
         '<option value="">-- เลือกชื่อ --</option>';
+
 
     const student =
         students.find(
@@ -1127,6 +1175,7 @@ function updatePaymentStudentName() {
             }
         );
 
+
     if (student) {
 
         const option =
@@ -1134,14 +1183,18 @@ function updatePaymentStudentName() {
                 "option"
             );
 
+
         option.value =
             student.name;
+
 
         option.textContent =
             student.name;
 
+
         option.selected =
             true;
+
 
         nameSelect.appendChild(
             option
@@ -1161,20 +1214,26 @@ async function checkPayment() {
     const number =
         $("student")?.value;
 
+
     const month =
         $("month")?.value;
+
 
     const status =
         $("status");
 
+
     const requiredEl =
         $("required");
+
 
     const paidEl =
         $("paid");
 
+
     const remainingEl =
         $("remaining");
+
 
     if (
         !number ||
@@ -1182,36 +1241,28 @@ async function checkPayment() {
     ) {
 
         if (requiredEl) {
-
             requiredEl.textContent =
                 "0 บาท";
-
         }
 
         if (paidEl) {
-
             paidEl.textContent =
                 "0 บาท";
-
         }
 
         if (remainingEl) {
-
             remainingEl.textContent =
                 "0 บาท";
-
         }
 
         if (status) {
-
             status.textContent =
                 "กรุณาเลือกเลขที่ ชื่อ และเดือน";
-
         }
 
         return;
-
     }
+
 
     if (!getAuthToken()) {
 
@@ -1225,6 +1276,7 @@ async function checkPayment() {
         return;
 
     }
+
 
     try {
 
@@ -1240,14 +1292,15 @@ async function checkPayment() {
                 }
             );
 
+
         const response =
             await fetch(
                 url,
                 {
-                    cache:
-                        "no-store"
+                    cache: "no-store"
                 }
             );
+
 
         if (!response.ok) {
 
@@ -1258,8 +1311,10 @@ async function checkPayment() {
 
         }
 
+
         const data =
             await response.json();
+
 
         if (!data.success) {
 
@@ -1268,10 +1323,9 @@ async function checkPayment() {
                     data.message
                 )
             ) {
-
                 return;
-
             }
+
 
             if (status) {
 
@@ -1282,25 +1336,27 @@ async function checkPayment() {
             }
 
             return;
-
         }
+
 
         const required =
             Number(
                 data.required
             ) || 0;
 
+
         const paid =
             Number(
                 data.paid
             ) || 0;
 
+
         const remaining =
             Math.max(
-                required -
-                paid,
+                required - paid,
                 0
             );
+
 
         if (requiredEl) {
 
@@ -1312,6 +1368,7 @@ async function checkPayment() {
 
         }
 
+
         if (paidEl) {
 
             paidEl.textContent =
@@ -1322,6 +1379,7 @@ async function checkPayment() {
 
         }
 
+
         if (remainingEl) {
 
             remainingEl.textContent =
@@ -1331,6 +1389,7 @@ async function checkPayment() {
                 " บาท";
 
         }
+
 
         if (status) {
 
@@ -1364,15 +1423,15 @@ async function checkPayment() {
             error
         );
 
+
         if (
             handleAuthError(
                 error.message
             )
         ) {
-
             return;
-
         }
+
 
         if (status) {
 
@@ -1414,6 +1473,7 @@ function crc16(data) {
     let crc =
         0xFFFF;
 
+
     for (
         let i = 0;
         i < data.length;
@@ -1422,6 +1482,7 @@ function crc16(data) {
 
         crc ^=
             data.charCodeAt(i) << 8;
+
 
         for (
             let j = 0;
@@ -1445,12 +1506,14 @@ function crc16(data) {
 
             }
 
+
             crc &=
                 0xFFFF;
 
         }
 
     }
+
 
     return crc
         .toString(16)
@@ -1475,6 +1538,7 @@ function createPromptPayPayload(
                 ""
             );
 
+
     if (
         phone.startsWith("0")
     ) {
@@ -1484,6 +1548,7 @@ function createPromptPayPayload(
             phone.substring(1);
 
     }
+
 
     const merchantAccountInfo =
         emvTag(
@@ -1495,8 +1560,10 @@ function createPromptPayPayload(
             phone
         );
 
+
     let payload =
         "";
+
 
     payload +=
         emvTag(
@@ -1504,11 +1571,13 @@ function createPromptPayPayload(
             "01"
         );
 
+
     payload +=
         emvTag(
             "01",
             "12"
         );
+
 
     payload +=
         emvTag(
@@ -1516,17 +1585,20 @@ function createPromptPayPayload(
             merchantAccountInfo
         );
 
+
     payload +=
         emvTag(
             "52",
             "0000"
         );
 
+
     payload +=
         emvTag(
             "53",
             "764"
         );
+
 
     if (
         Number(amount) > 0
@@ -1541,11 +1613,13 @@ function createPromptPayPayload(
 
     }
 
+
     payload +=
         emvTag(
             "58",
             "TH"
         );
+
 
     payload +=
         emvTag(
@@ -1553,15 +1627,18 @@ function createPromptPayPayload(
             "SSW ROOM M515"
         );
 
+
     payload +=
         emvTag(
             "60",
             "LOEI"
         );
 
+
     const crcInput =
         payload +
         "6304";
+
 
     return (
         crcInput +
@@ -1580,28 +1657,32 @@ function generatePaymentQR() {
     const amountInput =
         $("amount");
 
+
     const qrContainer =
         $("qrcode");
 
+
     const qrAmount =
         $("qrAmount");
+
 
     if (
         !amountInput ||
         !qrContainer
     ) {
-
         return;
-
     }
+
 
     const amount =
         Number(
             amountInput.value
         );
 
+
     qrContainer.innerHTML =
         "";
+
 
     if (
         !amount ||
@@ -1616,8 +1697,8 @@ function generatePaymentQR() {
         }
 
         return;
-
     }
+
 
     if (
         typeof QRCode ===
@@ -1628,14 +1709,15 @@ function generatePaymentQR() {
             "<p>โหลดระบบ QR ไม่สำเร็จ</p>";
 
         return;
-
     }
+
 
     const payload =
         createPromptPayPayload(
             PROMPTPAY_NUMBER,
             amount
         );
+
 
     new QRCode(
         qrContainer,
@@ -1653,6 +1735,7 @@ function generatePaymentQR() {
                 QRCode.CorrectLevel.M
         }
     );
+
 
     if (qrAmount) {
 
@@ -1679,11 +1762,11 @@ function setupQR() {
     const amount =
         $("amount");
 
+
     if (!amount) {
-
         return;
-
     }
+
 
     amount.addEventListener(
         "input",
@@ -1702,17 +1785,18 @@ function setupSlipFile() {
     const fileInput =
         $("slipFile");
 
+
     const fileName =
         $("fileName");
+
 
     if (
         !fileInput ||
         !fileName
     ) {
-
         return;
-
     }
+
 
     fileInput.addEventListener(
         "change",
@@ -1755,11 +1839,13 @@ function compressImage(file) {
             const reader =
                 new FileReader();
 
+
             reader.onload =
                 function (event) {
 
                     const image =
                         new Image();
+
 
                     image.onload =
                         function () {
@@ -1767,11 +1853,14 @@ function compressImage(file) {
                             const maxWidth =
                                 1200;
 
+
                             let width =
                                 image.width;
 
+
                             let height =
                                 image.height;
+
 
                             if (
                                 width >
@@ -1790,21 +1879,26 @@ function compressImage(file) {
 
                             }
 
+
                             const canvas =
                                 document.createElement(
                                     "canvas"
                                 );
 
+
                             canvas.width =
                                 width;
 
+
                             canvas.height =
                                 height;
+
 
                             const ctx =
                                 canvas.getContext(
                                     "2d"
                                 );
+
 
                             ctx.drawImage(
                                 image,
@@ -1814,6 +1908,7 @@ function compressImage(file) {
                                 height
                             );
 
+
                             resolve(
                                 canvas.toDataURL(
                                     "image/jpeg",
@@ -1822,6 +1917,7 @@ function compressImage(file) {
                             );
 
                         };
+
 
                     image.onerror =
                         function () {
@@ -1834,10 +1930,12 @@ function compressImage(file) {
 
                         };
 
+
                     image.src =
                         event.target.result;
 
                 };
+
 
             reader.onerror =
                 function () {
@@ -1849,6 +1947,7 @@ function compressImage(file) {
                     );
 
                 };
+
 
             reader.readAsDataURL(
                 file
@@ -1869,20 +1968,26 @@ async function submitPaymentData() {
     const number =
         $("paymentStudent")?.value;
 
+
     const month =
         $("paymentMonth")?.value;
+
 
     const amount =
         $("amount")?.value;
 
+
     const date =
         $("date")?.value;
+
 
     const fileInput =
         $("slipFile");
 
+
     const status =
         $("submitStatus");
+
 
     if (!number) {
 
@@ -1891,8 +1996,8 @@ async function submitPaymentData() {
         );
 
         return;
-
     }
+
 
     if (!month) {
 
@@ -1901,8 +2006,8 @@ async function submitPaymentData() {
         );
 
         return;
-
     }
+
 
     if (
         !amount ||
@@ -1914,8 +2019,8 @@ async function submitPaymentData() {
         );
 
         return;
-
     }
+
 
     if (!date) {
 
@@ -1924,8 +2029,8 @@ async function submitPaymentData() {
         );
 
         return;
-
     }
+
 
     if (
         !fileInput ||
@@ -1937,8 +2042,8 @@ async function submitPaymentData() {
         );
 
         return;
-
     }
+
 
     if (!getAuthToken()) {
 
@@ -1949,8 +2054,8 @@ async function submitPaymentData() {
         logout();
 
         return;
-
     }
+
 
     try {
 
@@ -1961,10 +2066,12 @@ async function submitPaymentData() {
 
         }
 
+
         const image =
             await compressImage(
                 fileInput.files[0]
             );
+
 
         const payload = {
 
@@ -1991,6 +2098,7 @@ async function submitPaymentData() {
 
         };
 
+
         const response =
             await fetch(
                 API_URL +
@@ -2010,6 +2118,7 @@ async function submitPaymentData() {
                 }
             );
 
+
         if (!response.ok) {
 
             throw new Error(
@@ -2019,8 +2128,10 @@ async function submitPaymentData() {
 
         }
 
+
         const data =
             await response.json();
+
 
         if (!data.success) {
 
@@ -2029,10 +2140,9 @@ async function submitPaymentData() {
                     data.message
                 )
             ) {
-
                 return;
-
             }
+
 
             if (status) {
 
@@ -2042,14 +2152,15 @@ async function submitPaymentData() {
 
             }
 
+
             alert(
                 data.message ||
                 "ไม่สามารถบันทึกข้อมูลได้"
             );
 
             return;
-
         }
+
 
         if (status) {
 
@@ -2059,11 +2170,16 @@ async function submitPaymentData() {
 
         }
 
+
         alert(
             data.message ||
             "แจ้งชำระเงินสำเร็จ ✓"
         );
 
+
+        // =================================================
+        // ล้างฟอร์ม
+        // =================================================
 
         const paymentStudent =
             $("paymentStudent");
@@ -2075,6 +2191,7 @@ async function submitPaymentData() {
 
         }
 
+
         const paymentStudentName =
             $("paymentStudentName");
 
@@ -2084,6 +2201,7 @@ async function submitPaymentData() {
                 '<option value="">-- เลือกชื่อ --</option>';
 
         }
+
 
         const paymentMonth =
             $("paymentMonth");
@@ -2095,6 +2213,7 @@ async function submitPaymentData() {
 
         }
 
+
         const amountEl =
             $("amount");
 
@@ -2104,6 +2223,7 @@ async function submitPaymentData() {
                 "";
 
         }
+
 
         const dateEl =
             $("date");
@@ -2115,8 +2235,10 @@ async function submitPaymentData() {
 
         }
 
+
         fileInput.value =
             "";
+
 
         const fileName =
             $("fileName");
@@ -2128,6 +2250,7 @@ async function submitPaymentData() {
 
         }
 
+
         const qr =
             $("qrcode");
 
@@ -2137,6 +2260,7 @@ async function submitPaymentData() {
                 "";
 
         }
+
 
         const qrAmount =
             $("qrAmount");
@@ -2156,15 +2280,15 @@ async function submitPaymentData() {
             error
         );
 
+
         if (
             handleAuthError(
                 error.message
             )
         ) {
-
             return;
-
         }
+
 
         if (status) {
 
@@ -2172,6 +2296,7 @@ async function submitPaymentData() {
                 "เกิดข้อผิดพลาดในการเชื่อมต่อ";
 
         }
+
 
         alert(
             "ไม่สามารถเชื่อมต่อ Google Apps Script ได้"
@@ -2191,11 +2316,11 @@ function setupOverview() {
     const month =
         $("overviewMonth");
 
+
     if (!month) {
-
         return;
-
     }
+
 
     month.addEventListener(
         "change",
@@ -2214,23 +2339,30 @@ async function loadOverview() {
     const month =
         $("overviewMonth")?.value;
 
+
     const grid =
         $("studentGrid");
 
+
     const status =
         $("overviewStatus");
+
 
     if (
         !grid ||
         !month
     ) {
-
         return;
-
     }
+
+
+    // =================================================
+    // ตรวจ Token ก่อนเรียก API
+    // =================================================
 
     const token =
         getAuthToken();
+
 
     if (!token) {
 
@@ -2241,9 +2373,11 @@ async function loadOverview() {
 
         }
 
+
         alert(
             "ไม่พบ Session การเข้าสู่ระบบ กรุณาเข้าสู่ระบบใหม่"
         );
+
 
         logout();
 
@@ -2251,8 +2385,10 @@ async function loadOverview() {
 
     }
 
+
     grid.innerHTML =
         "";
+
 
     if (status) {
 
@@ -2260,6 +2396,7 @@ async function loadOverview() {
             "กำลังโหลดข้อมูล...";
 
     }
+
 
     try {
 
@@ -2272,15 +2409,18 @@ async function loadOverview() {
                 }
             );
 
+
         console.log(
             "OVERVIEW URL:",
             url
         );
 
+
         console.log(
             "AUTH TOKEN EXISTS:",
             !!getAuthToken()
         );
+
 
         const response =
             await fetch(
@@ -2291,6 +2431,7 @@ async function loadOverview() {
                 }
             );
 
+
         if (!response.ok) {
 
             throw new Error(
@@ -2300,13 +2441,16 @@ async function loadOverview() {
 
         }
 
+
         const data =
             await response.json();
+
 
         console.log(
             "OVERVIEW RESPONSE:",
             data
         );
+
 
         if (!data.success) {
 
@@ -2315,10 +2459,9 @@ async function loadOverview() {
                     data.message
                 )
             ) {
-
                 return;
-
             }
+
 
             throw new Error(
                 data.message ||
@@ -2327,9 +2470,11 @@ async function loadOverview() {
 
         }
 
+
         renderStudentCards(
             data.students || []
         );
+
 
         if (status) {
 
@@ -2353,15 +2498,15 @@ async function loadOverview() {
             error
         );
 
+
         if (
             handleAuthError(
                 error.message
             )
         ) {
-
             return;
-
         }
+
 
         if (status) {
 
@@ -2387,14 +2532,15 @@ function renderStudentCards(
     const grid =
         $("studentGrid");
 
+
     if (!grid) {
-
         return;
-
     }
+
 
     grid.innerHTML =
         "";
+
 
     if (
         !Array.isArray(data) ||
@@ -2411,6 +2557,7 @@ function renderStudentCards(
 
     }
 
+
     data.forEach(
         function (student) {
 
@@ -2418,22 +2565,24 @@ function renderStudentCards(
                 `images/${student.number}.jpg`;
 
             const card =
-                document.createElement(
-                    "button"
-                );
+                document.createElement("button");
+
 
             card.className =
                 "student-card";
+
 
             const paid =
                 Number(
                     student.paid
                 ) || 0;
 
+
             const required =
                 Number(
                     student.required
                 ) || 0;
+
 
             const remaining =
                 Math.max(
@@ -2442,36 +2591,32 @@ function renderStudentCards(
                     0
                 );
 
+
             const complete =
                 remaining <= 0 &&
                 required > 0;
 
+
+            // =================================================
+            // สร้าง Card
+            // =================================================
+
             card.innerHTML = `
 
                 <div class="student-avatar">
-
-                    <img
-                        src="${photo}"
-                        alt="${escapeHtml(student.name)}"
-                        onerror="this.style.display='none';"
-                    >
-
+                    <img src="${photo}" alt="${escapeHtml(student.name)}">
                 </div>
 
                 <div class="student-number">
-
                     เลขที่ ${escapeHtml(
                         student.number
                     )}
-
                 </div>
 
                 <div class="student-name">
-
                     ${escapeHtml(
                         student.name
                     )}
-
                 </div>
 
                 <div class="student-balance ${
@@ -2494,6 +2639,7 @@ function renderStudentCards(
 
             `;
 
+
             card.addEventListener(
                 "click",
                 function () {
@@ -2504,6 +2650,7 @@ function renderStudentCards(
 
                 }
             );
+
 
             grid.appendChild(
                 card
@@ -2519,9 +2666,7 @@ function renderStudentCards(
 // รายละเอียดนักเรียน
 // =====================================================
 
-function showStudentDetail(
-    student
-) {
+function showStudentDetail(student) {
 
     const modal =
         $("studentModal");
@@ -2529,12 +2674,11 @@ function showStudentDetail(
     const detailPhoto =
         $("detailPhoto");
 
+
     if (detailPhoto) {
 
         detailPhoto.src =
-            `images/${String(
-                student.number
-            ).trim()}.jpg`;
+            `images/${String(student.number).trim()}.jpg`;
 
         detailPhoto.alt =
             student.name ||
@@ -2542,15 +2686,18 @@ function showStudentDetail(
 
     }
 
+
     const required =
         Number(
             student.required
         ) || 0;
 
+
     const paid =
         Number(
             student.paid
         ) || 0;
+
 
     const remaining =
         Math.max(
@@ -2559,23 +2706,30 @@ function showStudentDetail(
             0
         );
 
+
     const detailNumber =
         $("detailNumber");
+
 
     const detailName =
         $("detailName");
 
+
     const detailRequired =
         $("detailRequired");
+
 
     const detailPaid =
         $("detailPaid");
 
+
     const detailRemaining =
         $("detailRemaining");
 
+
     const detailStatus =
         $("detailStatus");
+
 
     if (detailNumber) {
 
@@ -2585,12 +2739,14 @@ function showStudentDetail(
 
     }
 
+
     if (detailName) {
 
         detailName.textContent =
             student.name;
 
     }
+
 
     if (detailRequired) {
 
@@ -2602,6 +2758,7 @@ function showStudentDetail(
 
     }
 
+
     if (detailPaid) {
 
         detailPaid.textContent =
@@ -2612,6 +2769,7 @@ function showStudentDetail(
 
     }
 
+
     if (detailRemaining) {
 
         detailRemaining.textContent =
@@ -2621,6 +2779,7 @@ function showStudentDetail(
             " บาท";
 
     }
+
 
     if (detailStatus) {
 
@@ -2658,6 +2817,7 @@ function showStudentDetail(
 
     }
 
+
     if (modal) {
 
         modal.style.display =
@@ -2677,6 +2837,7 @@ function closeStudentModal() {
     const modal =
         $("studentModal");
 
+
     if (modal) {
 
         modal.style.display =
@@ -2690,419 +2851,90 @@ function closeStudentModal() {
 // =====================================================
 // พื้นหลังขยับตามการเอียงมือถือ
 // =====================================================
-//
-// สำคัญ:
-// ฟังก์ชันนี้ "ไม่ขอ Permission"
-// เพราะ iPhone ต้องให้ requestPermission()
-// ถูกเรียกจากการกดของผู้ใช้โดยตรง
-//
-// =====================================================
 
-function startTiltBackground() {
+async function startTiltBackground() {
 
     if (tiltStarted) {
-
-        return true;
-
+        return;
     }
 
-    const welcome =
-        $("welcomeScreen");
+    const welcome = $("welcomeScreen");
 
-    const background =
-        welcome?.querySelector(
-            ".welcome-background"
-        );
+    if (!welcome) {
+        return;
+    }
 
+    // ขอสิทธิ์ Motion สำหรับ iPhone / iPad
     if (
-        !welcome ||
-        !background
+        typeof DeviceOrientationEvent !== "undefined" &&
+        typeof DeviceOrientationEvent.requestPermission === "function"
     ) {
+        try {
 
-        console.warn(
-            "ไม่พบ welcomeScreen หรือ welcome-background"
-        );
+            const permission =
+                await DeviceOrientationEvent.requestPermission();
 
-        return false;
+            if (permission !== "granted") {
+                return;
+            }
 
+        } catch (error) {
+
+            console.error(
+                "ไม่สามารถขอสิทธิ์ Motion ได้:",
+                error
+            );
+
+            return;
+        }
     }
 
+    tiltStarted = true;
 
-    // =================================================
-    // ค่าการเคลื่อนไหว
-    // =================================================
-
-    let targetX =
-        0;
-
-    let currentX =
-        0;
-
-    let targetY =
-        0;
-
-    let currentY =
-        0;
-
-    let animationRunning =
-        false;
-
-
-    // =================================================
-    // Animation แบบ GPU
-    // =================================================
+    let targetPosition = 50;
+    let currentPosition = 50;
+    let animationRunning = false;
 
     function updateBackground() {
 
-        currentX +=
-            (
-                targetX -
-                currentX
-            ) * 0.10;
+        currentPosition +=
+            (targetPosition - currentPosition) * 0.12;
 
-        currentY +=
-            (
-                targetY -
-                currentY
-            ) * 0.10;
-
-
-        background.style.transform =
-            `translate3d(${currentX}px, ${currentY}px, 0)`;
-
+        welcome.style.backgroundPosition =
+            `${currentPosition}% center`;
 
         if (
-            Math.abs(
-                targetX -
-                currentX
-            ) > 0.05 ||
-
-            Math.abs(
-                targetY -
-                currentY
-            ) > 0.05
+            Math.abs(targetPosition - currentPosition) > 0.05
         ) {
-
-            requestAnimationFrame(
-                updateBackground
-            );
-
+            requestAnimationFrame(updateBackground);
+        } else {
+            animationRunning = false;
         }
-        else {
-
-            animationRunning =
-                false;
-
-        }
-
     }
-
-
-    // =================================================
-    // ตรวจจับการเอียง
-    // =================================================
-
-    function handleOrientation(
-        event
-    ) {
-
-        let gamma =
-            Number(
-                event.gamma
-            ) || 0;
-
-        let beta =
-            Number(
-                event.beta
-            ) || 0;
-
-
-        // จำกัดค่าเพื่อไม่ให้ภาพหมุนแรงเกินไป
-        gamma =
-            Math.max(
-                -30,
-                Math.min(
-                    30,
-                    gamma
-                )
-            );
-
-
-        beta =
-            Math.max(
-                -30,
-                Math.min(
-                    30,
-                    beta - 45
-                )
-            );
-
-
-        // เพิ่มระยะให้เห็นการขยับชัดเจนบนมือถือ
-        targetX =
-            (
-                gamma /
-                30
-            ) * 70;
-
-        targetY =
-            (
-                beta /
-                30
-            ) * 45;
-
-
-        if (
-            !animationRunning
-        ) {
-
-            animationRunning =
-                true;
-
-            requestAnimationFrame(
-                updateBackground
-            );
-
-        }
-
-    }
-
-
-    // =================================================
-    // Device Orientation
-    // =================================================
 
     window.addEventListener(
         "deviceorientation",
-        handleOrientation,
-        {
-            passive:
-                true
-        }
-    );
+        function (event) {
 
+            let gamma = event.gamma || 0;
 
-    // =================================================
-    // บาง iPhone / Browser ใช้ absolute orientation
-    // =================================================
+            gamma = Math.max(
+                -30,
+                Math.min(30, gamma)
+            );
 
-    window.addEventListener(
-        "deviceorientationabsolute",
-        handleOrientation,
-        {
-            passive:
-                true
-        }
-    );
+            targetPosition =
+                50 + (gamma / 30) * 35;
 
-
-    tiltStarted =
-        true;
-
-
-    console.log(
-        "Motion Sensor เริ่มทำงานแล้ว"
-    );
-
-    return true;
-
-}
-
-
-// =====================================================
-// iPHONE / iPAD MOTION PERMISSION
-// =====================================================
-//
-// สำคัญมาก:
-//
-// iPhone ไม่อนุญาตให้เรียก
-// DeviceOrientationEvent.requestPermission()
-// แบบสุ่มจากหน้าเว็บ
-//
-// ต้องเรียกจากการกดปุ่มของผู้ใช้โดยตรง
-//
-// =====================================================
-
-function setupTiltPermission() {
-
-    const button =
-        $("enableTilt");
-
-    if (!button) {
-
-        console.warn(
-            "ไม่พบปุ่ม enableTilt"
-        );
-
-        return;
-
-    }
-
-
-    button.addEventListener(
-        "click",
-        async function (event) {
-
-            event.preventDefault();
-
-            event.stopPropagation();
-
-
-            // ถ้าเปิดไปแล้ว
-            if (tiltStarted) {
-
-                button.textContent =
-                    "✓ เปิดการเอียงแล้ว";
-
-                button.disabled =
-                    true;
-
-                return;
-
-            }
-
-
-            // ป้องกันการกดซ้ำ
-            if (
-                tiltPermissionRequested
-            ) {
-
-                return;
-
-            }
-
-            tiltPermissionRequested =
-                true;
-
-
-            try {
-
-                // =================================================
-                // iPhone / iPad
-                // =================================================
-
-                if (
-                    typeof DeviceOrientationEvent !==
-                    "undefined" &&
-
-                    typeof DeviceOrientationEvent
-                        .requestPermission ===
-                    "function"
-                ) {
-
-                    button.textContent =
-                        "กำลังขอสิทธิ์ Motion...";
-
-
-                    // สำคัญ:
-                    // เรียกตรงจาก click event
-                    const permission =
-                        await DeviceOrientationEvent
-                            .requestPermission();
-
-
-                    if (
-                        permission !==
-                        "granted"
-                    ) {
-
-                        button.textContent =
-                            "⚠️ ต้องอนุญาต Motion";
-
-                        button.disabled =
-                            false;
-
-                        tiltPermissionRequested =
-                            false;
-
-                        alert(
-                            "กรุณาอนุญาตการเคลื่อนไหวและการวางแนวของอุปกรณ์ แล้วลองใหม่อีกครั้ง"
-                        );
-
-                        return;
-
-                    }
-
-                }
-
-
-                // =================================================
-                // เริ่ม Sensor หลังได้รับสิทธิ์
-                // =================================================
-
-                const started =
-                    startTiltBackground();
-
-
-                if (!started) {
-
-                    button.textContent =
-                        "⚠️ เริ่ม Motion ไม่สำเร็จ";
-
-                    button.disabled =
-                        false;
-
-                    tiltPermissionRequested =
-                        false;
-
-                    return;
-
-                }
-
-
-                // =================================================
-                // สำเร็จ
-                // =================================================
-
-                button.textContent =
-                    "✓ เปิดการเอียงแล้ว";
-
-                button.disabled =
-                    true;
-
-                button.style.opacity =
-                    "0.65";
-
-                button.style.cursor =
-                    "default";
-
-
-            }
-            catch (error) {
-
-                console.error(
-                    "MOTION PERMISSION ERROR:",
-                    error
-                );
-
-
-                button.textContent =
-                    "⚠️ เปิดการเอียงไม่สำเร็จ";
-
-
-                button.disabled =
-                    false;
-
-
-                tiltPermissionRequested =
-                    false;
-
-
-                alert(
-                    "ไม่สามารถเปิด Motion ได้ กรุณาตรวจสอบสิทธิ์การเคลื่อนไหวของ Safari"
-                );
-
+            if (!animationRunning) {
+                animationRunning = true;
+                requestAnimationFrame(updateBackground);
             }
 
         },
-        {
-            passive:
-                false
-        }
+        { passive: true }
     );
-
 }
-
 
 // =====================================================
 // ป้องกัน HTML Injection
@@ -3112,9 +2944,7 @@ function escapeHtml(
     text
 ) {
 
-    return String(
-        text
-    )
+    return String(text)
         .replace(
             /&/g,
             "&amp;"
@@ -3137,3 +2967,7 @@ function escapeHtml(
         );
 
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    startTiltBackground();
+});
