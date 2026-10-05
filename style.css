@@ -2492,20 +2492,7 @@ body {
 ===================================================== */
 
 .welcome-screen {
-    background-position: center center;
     background-size: cover;
-}
-
-/* จอแนวตั้ง */
-@media (orientation: portrait) {
-    .welcome-screen {
-        background-position: center center;
-    }
-}
-
-/* จอแนวนอน */
-@media (orientation: landscape) {
-    .welcome-screen {
-        background-position: center center;
-    }
+    background-position: 50% center;
+    transition: background-position 0.1s linear;
 }
