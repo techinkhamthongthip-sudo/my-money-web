@@ -50,8 +50,30 @@ document.addEventListener(
         setupSlipFile();
         setupOverview();
 
+
+        // =================================================
         // เริ่มพื้นหลังเอียงตั้งแต่หน้าแรก
-        await startTiltBackground();
+        // iPhone/iPad ต้องเริ่มจากการแตะหน้าจอ
+        // =================================================
+
+        const welcomeScreen =
+            $("welcomeScreen");
+
+        if (welcomeScreen) {
+
+            welcomeScreen.addEventListener(
+                "pointerdown",
+                function () {
+
+                    startTiltBackground();
+
+                },
+                {
+                    passive: true
+                }
+            );
+
+        }
 
     }
 );
