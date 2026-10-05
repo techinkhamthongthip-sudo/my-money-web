@@ -36,7 +36,7 @@ body {
         url("IMG_8121.jpeg");
 
     background-size: cover;
-    background-position: center;
+    background-position: center center;
     background-repeat: no-repeat;
 }
 
@@ -2484,4 +2484,27 @@ body {
     object-position: center;
     display: block;
     border-radius: 50%;
+}
+
+/* =====================================================
+   📱 หน้าแรก รองรับการเอียงจอ
+===================================================== */
+
+.welcome-screen {
+    background-position: center center;
+    background-size: cover;
+}
+
+/* จอแนวตั้ง */
+@media (orientation: portrait) {
+    .welcome-screen {
+        background-position: center center;
+    }
+}
+
+/* จอแนวนอน */
+@media (orientation: landscape) {
+    .welcome-screen {
+        background-position: center center;
+    }
 }
