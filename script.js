@@ -17,6 +17,7 @@ let AUTH_TOKEN =
     sessionStorage.getItem("M515_AUTH_TOKEN") || "";
 
 let students = [];
+let tiltStarted = false;
 
 
 // =====================================================
@@ -286,8 +287,6 @@ function setupLogin() {
 
 async function checkAccessCode() {
 
-    startTiltBackground();
-    
     const input =
         $("accessCode");
 
@@ -413,6 +412,13 @@ async function checkAccessCode() {
             "M515_AUTH_TOKEN",
             AUTH_TOKEN
         );
+
+
+        // =================================================
+        // เริ่มระบบตรวจจับการเอียงมือถือ
+        // =================================================
+
+        await startTiltBackground();
 
 
         // =================================================
@@ -2557,10 +2563,11 @@ function renderStudentCards(
     data.forEach(
         function (student) {
 
-            const photo = `images/${student.number}.jpg`;
+            const photo =
+                `images/${student.number}.jpg`;
 
             const card =
-            document.createElement("button");
+                document.createElement("button");
 
 
             card.className =
@@ -2663,20 +2670,29 @@ function renderStudentCards(
 
 function showStudentDetail(student) {
 
-    const modal = $("studentModal");
+    const modal =
+        $("studentModal");
 
-    const detailPhoto = $("detailPhoto");
+    const detailPhoto =
+        $("detailPhoto");
+
 
     if (detailPhoto) {
+
         detailPhoto.src =
             `images/${String(student.number).trim()}.jpg`;
 
         detailPhoto.alt =
-            student.name || "รูปนักเรียน";
+            student.name ||
+            "รูปนักเรียน";
 
     }
+
+
     const required =
-        Number(student.required) || 0;
+        Number(
+            student.required
+        ) || 0;
 
 
     const paid =
@@ -2834,12 +2850,68 @@ function closeStudentModal() {
 }
 
 
+// =====================================================
+// พื้นหลังขยับตามการเอียงมือถือ
+// =====================================================
+
+async function startTiltBackground() {
+
+    if (tiltStarted) {
+        return;
+    }
+
+
+    const welcome =
+        $("welcomeScreen");
+
+
+    if (!welcome) {
+        return;
+    }
+
+
+    // iPhone / iPad ต้องขอสิทธิ์ก่อน
+    if (
+        typeof DeviceOrientationEvent !== "undefined" &&
+        typeof DeviceOrientationEvent.requestPermission === "function"
+    ) {
+
+        try {
+
+            const permission =
+                await DeviceOrientationEvent.requestPermission();
+
+
+            if (permission !== "granted") {
+                return;
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "ไม่สามารถขอสิทธิ์ Motion ได้:",
+                error
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    // ป้องกันการสร้าง Event ซ้ำ
+    tiltStarted = true;
+
+
     window.addEventListener(
         "deviceorientation",
         function (event) {
 
             let gamma =
                 event.gamma || 0;
+
 
             // จำกัดการเอียง
             gamma =
@@ -2851,6 +2923,7 @@ function closeStudentModal() {
                     )
                 );
 
+
             // -30° = ซ้าย
             //  0°  = กลาง
             // +30° = ขวา
@@ -2858,6 +2931,7 @@ function closeStudentModal() {
             const position =
                 50 +
                 (gamma / 30) * 35;
+
 
             welcome.style.backgroundPosition =
                 `${position}% center`;
@@ -2867,41 +2941,6 @@ function closeStudentModal() {
     );
 
 }
-
-
-// =====================================================
-// ป้องกัน HTML Injection
-// =====================================================
-
-function escapeHtml(
-    text
-) {
-
-    return String(text)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
 
 
 // =====================================================
