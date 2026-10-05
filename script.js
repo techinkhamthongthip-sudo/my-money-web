@@ -413,11 +413,8 @@ async function checkAccessCode() {
             AUTH_TOKEN
         );
 
-
-        // =================================================
-        // เริ่มระบบตรวจจับการเอียงมือถือ
-        // =================================================
-
+        // เริ่มระบบเอียงพื้นหลัง
+        await startTiltBackground();
 
         // =================================================
         // โหลดข้อมูลหลัง Login
@@ -2852,6 +2849,10 @@ function closeStudentModal() {
 // พื้นหลังขยับตามการเอียงมือถือ
 // =====================================================
 
+// =====================================================
+// พื้นหลังขยับตามการเอียงมือถือ
+// =====================================================
+
 async function startTiltBackground() {
 
     if (tiltStarted) {
@@ -2859,12 +2860,14 @@ async function startTiltBackground() {
     }
 
     const welcome = $("welcomeScreen");
+    const background = welcome?.querySelector(".welcome-background");
 
-    if (!welcome) {
+    if (!welcome || !background) {
+        console.error("ไม่พบ welcome-background");
         return;
     }
 
-    // ขอสิทธิ์ Motion สำหรับ iPhone / iPad
+    // iPhone / iPad ต้องขอสิทธิ์ Motion
     if (
         typeof DeviceOrientationEvent !== "undefined" &&
         typeof DeviceOrientationEvent.requestPermission === "function"
@@ -2875,6 +2878,7 @@ async function startTiltBackground() {
                 await DeviceOrientationEvent.requestPermission();
 
             if (permission !== "granted") {
+                console.log("ไม่ได้รับสิทธิ์ Motion");
                 return;
             }
 
@@ -2891,49 +2895,96 @@ async function startTiltBackground() {
 
     tiltStarted = true;
 
-    let targetPosition = 50;
-    let currentPosition = 50;
+    let targetX = 0;
+    let targetY = 0;
+
+    let currentX = 0;
+    let currentY = 0;
+
     let animationRunning = false;
 
-    function updateBackground() {
 
-        currentPosition +=
-            (targetPosition - currentPosition) * 0.12;
+    function animateBackground() {
 
-        welcome.style.backgroundPosition =
-            `${currentPosition}% center`;
+        currentX +=
+            (targetX - currentX) * 0.08;
+
+        currentY +=
+            (targetY - currentY) * 0.08;
+
+
+        background.style.transform =
+            `translate3d(${currentX}px, ${currentY}px, 0)`;
+
 
         if (
-            Math.abs(targetPosition - currentPosition) > 0.05
+            Math.abs(targetX - currentX) > 0.05 ||
+            Math.abs(targetY - currentY) > 0.05
         ) {
-            requestAnimationFrame(updateBackground);
-        } else {
-            animationRunning = false;
+
+            requestAnimationFrame(
+                animateBackground
+            );
+
         }
+        else {
+
+            animationRunning = false;
+
+        }
+
     }
+
 
     window.addEventListener(
         "deviceorientation",
         function (event) {
 
-            let gamma = event.gamma || 0;
+            let gamma =
+                event.gamma || 0;
 
+            let beta =
+                event.beta || 0;
+
+
+            // จำกัดการเอียง
             gamma = Math.max(
                 -30,
                 Math.min(30, gamma)
             );
 
-            targetPosition =
-                50 + (gamma / 30) * 35;
+            beta = Math.max(
+                -30,
+                Math.min(30, beta)
+            );
+
+
+            // ซ้าย / ขวา
+            targetX =
+                (gamma / 30) * 45;
+
+
+            // หน้า / หลัง
+            targetY =
+                (beta / 30) * 30;
+
 
             if (!animationRunning) {
+
                 animationRunning = true;
-                requestAnimationFrame(updateBackground);
+
+                requestAnimationFrame(
+                    animateBackground
+                );
+
             }
 
         },
-        { passive: true }
+        {
+            passive: true
+        }
     );
+
 }
 
 // =====================================================
@@ -2968,6 +3019,3 @@ function escapeHtml(
 
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    startTiltBackground();
-});
