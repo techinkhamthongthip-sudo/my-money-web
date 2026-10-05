@@ -2555,7 +2555,7 @@ function renderStudentCards(
     data.forEach(
         function (student) {
 
-            const photo = `images/${student.number}.jpg`;
+            const photo = `images/${student.number}.JPG`;
 
             const card =
             document.createElement("button");
