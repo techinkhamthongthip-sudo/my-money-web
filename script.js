@@ -286,6 +286,8 @@ function setupLogin() {
 
 async function checkAccessCode() {
 
+    startTiltBackground();
+    
     const input =
         $("accessCode");
 
@@ -2830,6 +2832,76 @@ function closeStudentModal() {
     }
 
 }
+
+
+    window.addEventListener(
+        "deviceorientation",
+        function (event) {
+
+            let gamma =
+                event.gamma || 0;
+
+            // จำกัดการเอียง
+            gamma =
+                Math.max(
+                    -30,
+                    Math.min(
+                        30,
+                        gamma
+                    )
+                );
+
+            // -30° = ซ้าย
+            //  0°  = กลาง
+            // +30° = ขวา
+
+            const position =
+                50 +
+                (gamma / 30) * 35;
+
+            welcome.style.backgroundPosition =
+                `${position}% center`;
+
+        },
+        true
+    );
+
+}
+
+
+// =====================================================
+// ป้องกัน HTML Injection
+// =====================================================
+
+function escapeHtml(
+    text
+) {
+
+    return String(text)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
 
 
 // =====================================================
