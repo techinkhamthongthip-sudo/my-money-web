@@ -2493,3 +2493,945 @@ body {
     display: block;
     border-radius: 50%;
 }
+
+/* =========================================================
+   👑 LUXURY PREMIUM UI
+   ตกแต่งอย่างเดียว — ไม่แตะฟังก์ชัน
+========================================================= */
+
+/* ---------------------------------------------------------
+   GLOBAL
+--------------------------------------------------------- */
+
+html,
+body {
+    background: #0d0a12;
+}
+
+.page {
+    background:
+        radial-gradient(
+            circle at 15% 10%,
+            rgba(126, 72, 180, .14),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 85% 80%,
+            rgba(201, 164, 76, .08),
+            transparent 28%
+        ),
+        linear-gradient(
+            135deg,
+            #0d0a12,
+            #17111e 50%,
+            #0d0a12
+        );
+}
+
+
+/* ---------------------------------------------------------
+   🏠 HOME
+--------------------------------------------------------- */
+
+.home-page {
+    background:
+        radial-gradient(
+            circle at 10% 15%,
+            rgba(145, 77, 220, .18),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 90% 20%,
+            rgba(214, 170, 74, .10),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 70% 90%,
+            rgba(103, 63, 155, .15),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #0c0910,
+            #18111f,
+            #0e0a14
+        );
+}
+
+
+/* ---------------------------------------------------------
+   ✨ HOME HEADER
+--------------------------------------------------------- */
+
+.home-page .main-header {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(30, 22, 38, .96),
+            rgba(18, 14, 24, .94)
+        );
+
+    border:
+        1px solid rgba(207, 170, 82, .20);
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.38),
+        inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.home-page .main-header::before {
+    width: 4px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #d9b65a,
+            #8f5bd1,
+            #d9b65a
+        );
+}
+
+.home-page .small-title {
+    color: #c9a95a;
+    letter-spacing: 1.5px;
+}
+
+.home-page .main-header h2 {
+    background:
+        linear-gradient(
+            90deg,
+            #fff4ca,
+            #d7b65c,
+            #ffffff
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.home-page .header-logo {
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #e9dfca
+        );
+
+    border:
+        2px solid rgba(213,177,86,.45);
+
+    box-shadow:
+        0 0 0 5px rgba(213,177,86,.05),
+        0 15px 35px rgba(0,0,0,.4);
+}
+
+
+/* ---------------------------------------------------------
+   💎 HOME CARDS
+--------------------------------------------------------- */
+
+.home-page .menu-card {
+    min-height: 260px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(34,25,43,.98),
+            rgba(19,14,25,.98)
+        );
+
+    border:
+        1px solid rgba(194,158,77,.18);
+
+    box-shadow:
+        0 18px 45px rgba(0,0,0,.30),
+        inset 0 1px 0 rgba(255,255,255,.035);
+
+    backdrop-filter: blur(15px);
+}
+
+.home-page .menu-card::before {
+    height: 3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #8b5ac8,
+            #d4af55,
+            #8b5ac8
+        );
+}
+
+.home-page .menu-card::after {
+    background:
+        radial-gradient(
+            circle,
+            rgba(205,164,69,.10),
+            transparent 70%
+        );
+}
+
+.home-page .menu-card:hover {
+    transform:
+        translateY(-10px);
+
+    border-color:
+        rgba(215,178,83,.50);
+
+    box-shadow:
+        0 30px 70px rgba(0,0,0,.45),
+        0 0 35px rgba(150,100,210,.08);
+}
+
+.home-page .menu-title {
+    color: #fff8e5;
+    letter-spacing: .2px;
+}
+
+.home-page .menu-description {
+    color: #a99eae;
+}
+
+
+/* ---------------------------------------------------------
+   🔮 ICONS
+--------------------------------------------------------- */
+
+.home-page .menu-icon {
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.30);
+
+    position: relative;
+    overflow: hidden;
+}
+
+.home-page .menu-icon::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.18),
+            transparent 45%
+        );
+
+    pointer-events: none;
+}
+
+.home-page .menu-card:nth-child(1) .menu-icon {
+    background:
+        linear-gradient(
+            145deg,
+            #67409a,
+            #322046
+        );
+
+    color: #f0d88a;
+}
+
+.home-page .menu-card:nth-child(2) .menu-icon {
+    background:
+        linear-gradient(
+            145deg,
+            #315d7d,
+            #182f42
+        );
+
+    color: #b9e5ff;
+}
+
+.home-page .menu-card:nth-child(3) .menu-icon {
+    background:
+        linear-gradient(
+            145deg,
+            #795044,
+            #3e241f
+        );
+
+    color: #f4d18a;
+}
+
+
+/* ---------------------------------------------------------
+   🔙 BACK BUTTON
+--------------------------------------------------------- */
+
+#checkPage .back-button,
+#paymentPage .back-button,
+#overviewPage .back-button {
+    background:
+        rgba(255,255,255,.055);
+
+    border:
+        1px solid rgba(255,255,255,.10);
+
+    color: #d7c9dd;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.20);
+
+    backdrop-filter: blur(12px);
+}
+
+#checkPage .back-button:hover,
+#paymentPage .back-button:hover,
+#overviewPage .back-button:hover {
+    background:
+        rgba(205,168,78,.10);
+
+    border-color:
+        rgba(205,168,78,.35);
+
+    color: #e8ca79;
+}
+
+
+/* ---------------------------------------------------------
+   🏷️ INNER PAGE TITLES
+--------------------------------------------------------- */
+
+#checkPage .section-title,
+#paymentPage .section-title,
+#overviewPage .section-title {
+    color: #f4e8c5;
+
+    text-shadow:
+        0 5px 25px rgba(0,0,0,.35);
+}
+
+#checkPage .section-title::after,
+#paymentPage .section-title::after,
+#overviewPage .section-title::after {
+    content: "";
+
+    display: block;
+
+    width: 65px;
+    height: 3px;
+
+    margin-top: 10px;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #d4af55,
+            transparent
+        );
+}
+
+
+/* ---------------------------------------------------------
+   💎 FORM CARD
+--------------------------------------------------------- */
+
+#checkPage .form-card,
+#paymentPage .form-card {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(30,23,38,.98),
+            rgba(17,13,22,.98)
+        );
+
+    border:
+        1px solid rgba(210,171,78,.18);
+
+    box-shadow:
+        0 25px 70px rgba(0,0,0,.38),
+        inset 0 1px 0 rgba(255,255,255,.035);
+
+    color: #eee6f0;
+}
+
+#checkPage .form-card::before,
+#paymentPage .form-card::before {
+    height: 3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #8a59c4,
+            #d4af55,
+            #8a59c4
+        );
+}
+
+
+/* ---------------------------------------------------------
+   📝 LABEL
+--------------------------------------------------------- */
+
+#checkPage .form-card label,
+#paymentPage .form-card label,
+#overviewPage .overview-control label {
+    color: #cdbfce;
+}
+
+
+/* ---------------------------------------------------------
+   🔽 INPUTS
+--------------------------------------------------------- */
+
+#checkPage .form-card select,
+#checkPage .form-card input,
+#paymentPage .form-card select,
+#paymentPage .form-card input,
+#overviewPage .overview-control select {
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    color: #f2edf4;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.025);
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+}
+
+#checkPage .form-card select:hover,
+#checkPage .form-card input:hover,
+#paymentPage .form-card select:hover,
+#paymentPage .form-card input:hover,
+#overviewPage .overview-control select:hover {
+    background:
+        rgba(255,255,255,.065);
+
+    border-color:
+        rgba(207,171,82,.35);
+}
+
+#checkPage .form-card select:focus,
+#checkPage .form-card input:focus,
+#paymentPage .form-card select:focus,
+#paymentPage .form-card input:focus,
+#overviewPage .overview-control select:focus {
+    background:
+        rgba(255,255,255,.075);
+
+    border-color:
+        #d2ad57;
+
+    box-shadow:
+        0 0 0 3px rgba(210,173,87,.10),
+        0 0 25px rgba(210,173,87,.06);
+}
+
+
+/* ---------------------------------------------------------
+   💰 SUMMARY
+--------------------------------------------------------- */
+
+#checkPage .summary-item {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.055),
+            rgba(255,255,255,.025)
+        ) !important;
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+#checkPage .summary-item:hover {
+    transform:
+        translateX(5px);
+
+    border-color:
+        rgba(211,174,83,.25);
+}
+
+#checkPage .summary-item span {
+    color: #aaa0ad;
+}
+
+#checkPage .summary-item strong {
+    color: #e4c36e !important;
+}
+
+#checkPage .summary-item:nth-child(2) strong {
+    color: #68d69c !important;
+}
+
+#checkPage .summary-item:nth-child(3) strong {
+    color: #e9b85d !important;
+}
+
+
+/* ---------------------------------------------------------
+   📢 STATUS
+--------------------------------------------------------- */
+
+#checkPage #status {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(139,89,196,.12),
+            rgba(211,174,83,.07)
+        );
+
+    border:
+        1px solid rgba(207,171,82,.16);
+
+    color: #d9c9dc;
+}
+
+
+/* ---------------------------------------------------------
+   💳 QR
+--------------------------------------------------------- */
+
+#paymentPage .qr-section {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(25,42,49,.95),
+            rgba(15,25,30,.98)
+        );
+
+    border:
+        1px solid rgba(100,192,214,.18);
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.25),
+        inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+#paymentPage .qr-title {
+    color: #dff7ff;
+}
+
+#paymentPage .qr-price {
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    color: #aabdc3;
+}
+
+#paymentPage .qr-price strong {
+    color: #6ed8a5;
+}
+
+#qrcode img,
+#qrcode canvas {
+    border:
+        8px solid white;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.35);
+}
+
+
+/* ---------------------------------------------------------
+   📎 SLIP
+--------------------------------------------------------- */
+
+#paymentPage #slipFile {
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px dashed rgba(207,171,82,.30);
+
+    color: #cfc3d2;
+}
+
+
+/* ---------------------------------------------------------
+   🚀 SUBMIT BUTTON
+--------------------------------------------------------- */
+
+#paymentPage .submit-button {
+    background:
+        linear-gradient(
+            135deg,
+            #7350a5,
+            #4a2e70 50%,
+            #9d7940
+        );
+
+    border:
+        1px solid rgba(229,198,112,.25);
+
+    box-shadow:
+        0 15px 35px rgba(65,35,90,.35),
+        inset 0 1px 0 rgba(255,255,255,.15);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        filter .2s ease;
+}
+
+#paymentPage .submit-button:hover {
+    transform:
+        translateY(-3px);
+
+    filter:
+        brightness(1.1);
+
+    box-shadow:
+        0 20px 45px rgba(65,35,90,.45),
+        0 0 25px rgba(205,165,74,.10);
+}
+
+#paymentPage .submit-button:active {
+    transform:
+        translateY(0)
+        scale(.98);
+}
+
+
+/* ---------------------------------------------------------
+   👥 OVERVIEW CONTROL
+--------------------------------------------------------- */
+
+#overviewPage .overview-control {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(30,22,38,.98),
+            rgba(17,13,22,.98)
+        );
+
+    border:
+        1px solid rgba(207,171,82,.16);
+
+    box-shadow:
+        0 20px 55px rgba(0,0,0,.30);
+}
+
+#overviewPage .overview-status {
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    color: #b9adb9;
+}
+
+
+/* ---------------------------------------------------------
+   👨‍🎓 STUDENT CARDS
+--------------------------------------------------------- */
+
+#overviewPage .student-card {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(31,24,40,.98),
+            rgba(18,14,24,.98)
+        );
+
+    border:
+        1px solid rgba(207,171,82,.14);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.30),
+        inset 0 1px 0 rgba(255,255,255,.025);
+
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+#overviewPage .student-card::before {
+    height: 3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #8d5ac5,
+            #d3ad55,
+            #8d5ac5
+        );
+}
+
+#overviewPage .student-card:hover {
+    transform:
+        translateY(-8px)
+        scale(1.015);
+
+    border-color:
+        rgba(214,178,83,.45);
+
+    box-shadow:
+        0 25px 55px rgba(0,0,0,.42),
+        0 0 25px rgba(140,90,190,.06);
+}
+
+
+/* ---------------------------------------------------------
+   👤 AVATAR
+--------------------------------------------------------- */
+
+#overviewPage .student-avatar {
+    background:
+        linear-gradient(
+            145deg,
+            #503372,
+            #241832
+        );
+
+    border:
+        2px solid rgba(215,178,83,.25);
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.30),
+        0 0 0 4px rgba(215,178,83,.035);
+}
+
+#overviewPage .student-avatar img {
+    transition:
+        transform .35s ease;
+}
+
+#overviewPage .student-card:hover .student-avatar img {
+    transform:
+        scale(1.08);
+}
+
+#overviewPage .student-number {
+    color: #938797;
+}
+
+#overviewPage .student-name {
+    color: #f2eaf4;
+}
+
+
+/* ---------------------------------------------------------
+   ✅ STATUS
+--------------------------------------------------------- */
+
+#overviewPage .paid-status {
+    background:
+        rgba(53,170,112,.12);
+
+    border:
+        1px solid rgba(75,205,137,.16);
+
+    color: #72dba3;
+}
+
+#overviewPage .unpaid-status {
+    background:
+        rgba(205,130,64,.10);
+
+    border:
+        1px solid rgba(220,160,75,.16);
+
+    color: #e6b56d;
+}
+
+
+/* ---------------------------------------------------------
+   🪟 MODAL
+--------------------------------------------------------- */
+
+#studentModal {
+    background:
+        rgba(5,3,8,.78);
+
+    backdrop-filter:
+        blur(14px);
+}
+
+#studentModal .modal-box {
+    background:
+        linear-gradient(
+            145deg,
+            #211829,
+            #100c15
+        );
+
+    border:
+        1px solid rgba(214,177,82,.22);
+
+    box-shadow:
+        0 35px 100px rgba(0,0,0,.65),
+        inset 0 1px 0 rgba(255,255,255,.035);
+
+    color: #eee6f0;
+}
+
+#studentModal .modal-box::before {
+    height: 3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #8a58c4,
+            #d4af55,
+            #8a58c4
+        );
+}
+
+#studentModal .modal-close {
+    color: #a99daa;
+
+    transition:
+        color .2s ease,
+        transform .2s ease;
+}
+
+#studentModal .modal-close:hover {
+    color: #e0bd67;
+
+    transform:
+        rotate(90deg);
+}
+
+#studentModal .modal-avatar {
+    background:
+        linear-gradient(
+            145deg,
+            #543775,
+            #251932
+        );
+
+    border:
+        2px solid rgba(214,177,82,.28);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.35);
+}
+
+#studentModal .detail-number {
+    color: #a99ba9;
+}
+
+#studentModal .modal-box h3 {
+    color: #f5e9c8;
+}
+
+#studentModal .detail-list div {
+    background:
+        rgba(255,255,255,.045) !important;
+
+    border:
+        1px solid rgba(255,255,255,.07);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+#studentModal .detail-list span {
+    color: #a89ba9;
+}
+
+#studentModal .detail-list strong {
+    color: #e0bd67;
+}
+
+
+/* ---------------------------------------------------------
+   📱 MOBILE
+--------------------------------------------------------- */
+
+@media (max-width: 600px) {
+
+    .home-page .main-header {
+        border-radius: 20px;
+    }
+
+    .home-page .menu-card {
+        min-height: 220px;
+        border-radius: 20px;
+    }
+
+    #checkPage .form-card,
+    #paymentPage .form-card {
+        border-radius: 20px;
+    }
+
+    #overviewPage .student-card {
+        border-radius: 16px;
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   ✨ PREMIUM SCROLLBAR
+--------------------------------------------------------- */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0d0a12;
+}
+
+::-webkit-scrollbar-thumb {
+    background:
+        linear-gradient(
+            180deg,
+            #6d438e,
+            #b38a45
+        );
+
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background:
+        linear-gradient(
+            180deg,
+            #9360bd,
+            #d1a653
+        );
+}
+
+
+/* ---------------------------------------------------------
+   💫 TEXT SELECTION
+--------------------------------------------------------- */
+
+::selection {
+    background: rgba(205,169,78,.25);
+    color: #fff5d5;
+}
+
+
+/* ---------------------------------------------------------
+   ⚡ REDUCE MOTION
+--------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+
+}
