@@ -2555,14 +2555,10 @@ function renderStudentCards(
     data.forEach(
         function (student) {
 
+            const photo = `images/${student.number}.jpg`;
+
             const card =
-                document.createElement(
-                    "button"
-                );
-
-
-            card.type =
-                "button";
+            document.createElement("button");
 
 
             card.className =
@@ -2601,7 +2597,7 @@ function renderStudentCards(
             card.innerHTML = `
 
                 <div class="student-avatar">
-                    👤
+                    <img src="${photo}" alt="${escapeHtml(student.name)}">
                 </div>
 
                 <div class="student-number">
