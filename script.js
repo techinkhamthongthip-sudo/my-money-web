@@ -2858,34 +2858,27 @@ async function startTiltBackground() {
         return;
     }
 
-
-    const welcome =
-        $("welcomeScreen");
-
+    const welcome = $("welcomeScreen");
 
     if (!welcome) {
         return;
     }
 
-
-    // iPhone / iPad ต้องขอสิทธิ์ก่อน
+    // ขอสิทธิ์ Motion สำหรับ iPhone / iPad
     if (
         typeof DeviceOrientationEvent !== "undefined" &&
         typeof DeviceOrientationEvent.requestPermission === "function"
     ) {
-
         try {
 
             const permission =
                 await DeviceOrientationEvent.requestPermission();
 
-
             if (permission !== "granted") {
                 return;
             }
 
-        }
-        catch (error) {
+        } catch (error) {
 
             console.error(
                 "ไม่สามารถขอสิทธิ์ Motion ได้:",
@@ -2893,53 +2886,55 @@ async function startTiltBackground() {
             );
 
             return;
-
         }
-
     }
 
-
-    // ป้องกันการสร้าง Event ซ้ำ
     tiltStarted = true;
 
+    let targetPosition = 50;
+    let currentPosition = 50;
+    let animationRunning = false;
+
+    function updateBackground() {
+
+        currentPosition +=
+            (targetPosition - currentPosition) * 0.12;
+
+        welcome.style.backgroundPosition =
+            `${currentPosition}% center`;
+
+        if (
+            Math.abs(targetPosition - currentPosition) > 0.05
+        ) {
+            requestAnimationFrame(updateBackground);
+        } else {
+            animationRunning = false;
+        }
+    }
 
     window.addEventListener(
         "deviceorientation",
         function (event) {
 
-            let gamma =
-                event.gamma || 0;
+            let gamma = event.gamma || 0;
 
+            gamma = Math.max(
+                -30,
+                Math.min(30, gamma)
+            );
 
-            // จำกัดการเอียง
-            gamma =
-                Math.max(
-                    -30,
-                    Math.min(
-                        30,
-                        gamma
-                    )
-                );
+            targetPosition =
+                50 + (gamma / 30) * 35;
 
-
-            // -30° = ซ้าย
-            //  0°  = กลาง
-            // +30° = ขวา
-
-            const position =
-                50 +
-                (gamma / 30) * 35;
-
-
-            welcome.style.backgroundPosition =
-                `${position}% center`;
+            if (!animationRunning) {
+                animationRunning = true;
+                requestAnimationFrame(updateBackground);
+            }
 
         },
-        true
+        { passive: true }
     );
-
 }
-
 
 // =====================================================
 // ป้องกัน HTML Injection
