@@ -418,8 +418,6 @@ async function checkAccessCode() {
         // เริ่มระบบตรวจจับการเอียงมือถือ
         // =================================================
 
-        await startTiltBackground();
-
 
         // =================================================
         // โหลดข้อมูลหลัง Login
@@ -2974,3 +2972,7 @@ function escapeHtml(
         );
 
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    startTiltBackground();
+});
